@@ -9,95 +9,117 @@ import java.util.Stack;
 %token DEFINITIONS, LITERAL, NOT, ALLOF, ANYOF, ENUM, REF, TYPE
 %token STRING, MINLEN, INT, MAXLEN, PATTERN, NUMBER, INTEGER, MINIMUM
 %token DEC, EXMINIMUM, MAXIMUM, EXMAXIMUM, MULTIPLEOF, OBJECT, PROPERTIES
-%token ADDITIONAOPROP, REQUIRED, PATTERNPROP, ARRAY, ITEMS, MINITEMS, MAXITEMS, UNIQUEITEMS
+%token ADDITIONALPROP, REQUIRED, PATTERNPROP, ARRAY, ITEMS, MINITEMS, MAXITEMS, UNIQUEITEMS
+%token ID, URI
 %token TRUE, FALSE
+
+%type <sval> LITERAL
+%type <sval> DEC
+%type <ival> INT
 
 %%
 
-JSDoc : '{' defs JSch '}' ;
+JSDoc : '{' '"' idDefsSch '}';
 
-defs : DEFINITIONS ':' '{' defsL '}' ',' |  ;
+idDefsSch :	idSch defs JSch
+		|	defs JSch
+		|	JSchD ;
 
-defsL : def defsTail ;
-defsTail : ',' def defsTail | ;
+idSch : ID '"' ':' '"' URI '"' ',' '"' ;
 
-def : LITERAL ':' '{' JSch '}' ;
+defs :
+	|	DEFINITIONS '"' ':' '{' defsL '}' ','
+	;
+defsL : kSch defsTail ;
+defsTail :
+		| ',' kSch defsTail ;
 
-JSch : 	strSch
-	|	numSch
-	|	intSch
-	|	objSch
-	|	arrSch
+kSch : '"' LITERAL '"' ':' '{' JSch '}' ;
+
+JSch : 	'"' JSchD ;
+JSchD :	res resL ;
+resL :
+	| ',' res resL ;
+res: 	typeDecl
 	|	refSch
 	|	not
 	|	allOf
 	|	anyOf
 	|	enum	;
 
-not : NOT ':' '{' JSch '}' ;
-allOf : ALLOF ':' '[' JSchL ']' ;
-anyOf : ANYOF '[' JSchL ']' ;
-enum : ENUM ':' '[' Jval JvalL ']' ;
+not : NOT '"' ':' '{' JSch '}' ;
+allOf : ALLOF '"' ':' '[' JSchL ']' ;
+anyOf : ANYOF '"' '[' JSchL ']' ;
+enum : ENUM '"' ':' '[' Jval JvalL ']' ;
 
 JSchL : '{' JSch '}' JSchLTail ;
-JSchLTail : ',' '{' JSch '}' JSchLTail | ;
+JSchLTail :
+			| ',' '{' JSch '}' JSchLTail ;
 
-JvalL : ',' Jval JvalL | ;
+JvalL :
+		| ',' Jval JvalL;
 
-refSch : REF ':' '"' '#' JPointer '"'
+refSch : REF '"' ':' '"' '#' JPointer '"'
 
-strSch : TYPE ':' STRING strResL ;
-strResL : ',' strRes strResL | ;
+typeDecl :	TYPE '"' ':' '"' typeSch;
+typeSch : 	STRING '"' strResL
+		|	NUMBER '"' numResL
+		|	INTEGER '"' numResL
+		|	OBJECT '"' objResL
+		|	ARRAY '"' arrResL ;
+
+strResL :
+		| ',' '"' strRes strResL;
 strRes : 	minLength
 		|	maxLength
 		|	pattern		;
 
-minLength : MINLEN ':' INT ;
-maxLength : MAXLEN ':' INT ;
-pattern : PATTERN ':' '"' regExp '"' ;
+minLength : MINLEN '"' ':' '"' INT '"' ;
+maxLength : MAXLEN '"' ':' '"' INT '"' ;
+pattern : PATTERN '"' ':' '"' regExp '"' ;
 
-numSch : TYPE ':' NUMBER numResL
-intSch : TYPE ':' INTEGER numResL
-numResL : ',' numRes numResL | ;
+numResL :
+		| ',' '"' numRes numResL ;
 numRes : 	min
 		|	exMin
 		|	max
 		|	exMax
 		|	mult	;
-min : MINIMUM ':' DEC
-exMin : EXMINIMUM ':' TRUE
-max : MAXIMUM ':' DEC
-exMax : EXMAXIMUM ':' TRUE
-mult : MULTIPLEOF ':' DEC
+min : MINIMUM '"' ':' DEC;
+exMin : EXMINIMUM '"' ':' TRUE;
+max : MAXIMUM '"' ':' DEC;
+exMax : EXMAXIMUM '"' ':' TRUE;
+mult : MULTIPLEOF '"' ':' DEC;
 
-objSch : TYPE ':' OBJECT objResL ;
-objResL : ',' objRes objResL | ;
+objResL :
+		| ',' '"' objRes objResL ;
 objRes :	prop
 		|	addPr
 		|	patPr
 		|	req	;
-prop : PROPERTIES '{' kSch kSchL '}' ;
-kSchL : ',' kSch kSchL | ;
-kSch : LITERAL ':' '{' JSch '}' ;
-addPr : ADDITIONAOPROP ':' FALSE ;
-req : REQUIRED ':' '[' LITERAL litL ']' ;
-litL : ',' LITERAL litL | ;
-patPr : PATTERNPROP ':' '{' patSch patSchL '}' ;
+prop : PROPERTIES '"' '{' kSch kSchL '}' ;
+kSchL :
+		| ',' kSch kSchL;
+kSch : '"' LITERAL '"' ':' '{' JSch '}' ;
+addPr : ADDITIONALPROP '"' ':' FALSE ;
+req : REQUIRED '"' ':' '[' '"' LITERAL '"' litL ']' ;
+litL : ',' '"' LITERAL '"' litL | ;
+patPr : PATTERNPROP '"' ':' '{' patSch patSchL '}' ;
 patSchL : ',' patSch patSchL ;
 patSch : '"' regExp '"' ':' '{' JSch '}' ;
 
-arrSch : TYPE ':' ARRAY arrResL ;
-arrResL : ',' arrRes arrResL | ;
+arrResL :
+		| ',' '"' arrRes arrResL;
 arrRes : 	itemo
 		|	itema
 		|	minIt
 		|	maxIt
 		|	unique	;
-itemo : ITEMS ':' '{' JSch '}' ;
-itema : ITEMS ':' '[' JSchL ']' ;
-minIt : MINITEMS ':' INT ;
-maxIt : MAXITEMS ':' INT ;
-unique : UNIQUEITEMS ':' TRUE ;
+itemo : ITEMS '"' ':' '{' JSch '}' ;
+itema : ITEMS '"' ':' '[' JSchL ']' ;
+minIt : MINITEMS '"' ':' INT ;
+maxIt : MAXITEMS '"' ':' INT ;
+unique : UNIQUEITEMS '"' ':' TRUE ;
 
 regExp : 'r' ;
 
@@ -126,6 +148,10 @@ regExp : 'r' ;
 
 	public void yyerror (String error) {
 		System.err.println ("Error: " + error + "  line: " + lexer.getLine());
+		if(yydebug){
+			//dump_stacks(statestk.length);
+			dump_stacks(10);
+		}
 	}
 
 	public JSchParser(Reader r) {
@@ -151,4 +177,8 @@ regExp : 'r' ;
 
 	public void testOutput(String test){
 		System.out.println("\n\tHello " + test);
+	}
+
+	public static void message(String msg){
+		System.out.println(msg);
 	}

@@ -1,0 +1,57 @@
+<JSDoc> ::= { ( <id>, )? ( <defs>, )? <JSch> }
+<id> ::= "id": "uri"
+<defs> ::= "definitions": { <kSch> (, <kSch>)*}
+<kSch> ::= <kword>: { <JSch> }
+<JSch> ::= ( <res> (, <res>)*)
+<res> ::= <type> | <strRes> | <numRes> | <arrRes> | <objRes> | <multRes> | <refSch> | <title> | <description>
+<type> ::= "type" : ([<typename> (, <typename>)*] | <typename>)
+<typename> ::= "string" | "integer" | "number" | "boolean" | "null" | "array" | "object"
+<title> ::= "title":  <string>
+<description> ::= "description":  <string>
+
+<strRes> :=  <minLen> | <maxLen> | <pattern>
+<minLen> := "minLength": <n>
+<maxLen> := "maxLength": <n>
+<pattern> := "pattern": "regExp"
+
+<numRes> := <min> | <max> | <multiple>
+<min> := "minimum": <r> (,<exMin>)?
+<exMin> := "exclusiveMinimum": <bool>
+<max> := "maximum": <r> (,<exMax>)?
+<exMax> := "exclusiveMaximum": <bool>
+<multiple> := "multipleOf": <r>
+
+<arrRes> := <items> | <additems> | <minitems> | <maxitems>  | <unique>
+<items> := ( <sameitems> |  <varitems> )
+<sameitems> := "items": { <JSch> }
+<varitems> := "items": [{ <JSch> }(,{ <JSch> })*]
+<additems> :=  "additionalItems": (<bool> | { <JSch> })
+<minitems> := "minItems": <n>
+<maxitems> := "maxItems": <n>
+<unique> := "uniqueItems": <bool>
+
+<objRes> := <prop> | <addprop> | <req> | <minprop> | <maxprop> | <dep> | <pattprop>
+<prop> := "properties": { <kSch> (, <kSch>)*}
+<kSch> := <kword>: { <JSch> }
+<addprop> := "additionalProperties": (<bool> | { <JSch> })
+<req> := "required": [ <kword> (, <kword>)*]
+<minprop> := "minProperties": <n>
+<maxprop> := "maxProperties": <n>
+<dep> := "dependencies": { <kDep> (, <kDep>)*}
+<kDep> := (<kArr> | <kSch>)
+<kArr> := <kword>: [ <kword> (, <kword>)*]
+<pattprop> := "patternProperties": { <patSch> (, <patSch>)*}
+<patSch> := "regExp": { <JSch> }
+
+<multRes> := <allOf> | <anyOf>| <oneOf> | <not> | <enum>
+<anyOf> := "anyOf": [ { <JSch> } (, { <JSch> }) * ]
+<allOf> := "allOf": [ { <JSch> } (, { <JSch> }) * ]
+<oneOf> := "oneOf": [ { <JSch> } (, { <JSch> }) * ]
+<not> := "not": { <JSch> }
+<enum> := "enum": [<Jval> (, <Jval>)*]
+
+<refSch> := "$ref": "uriRef"
+<uriRef> := ( <address> )? ( # / <JPointer> )?
+<JPointer> := ( / <path> )
+<path> := ( <unescaped> | <escaped> )
+<escaped> := ~0 | ~1
