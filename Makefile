@@ -20,8 +20,8 @@ clean:
 JSchParser.class: Yylex.java JSchParser.java
 	$(JAVAC) JSchParser.java
 
-Yylex.java: lexico.flex
-	$(JFLEX) lexico.flex
+Yylex.java: lexical.flex
+	$(JFLEX) lexical.flex
 
 JSchParser.java: JSchAutoRestYacc.y
 	$(BYACCJ) JSchAutoRestYacc.y
