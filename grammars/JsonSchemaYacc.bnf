@@ -1,0 +1,99 @@
+<JSDoc> ::= { '"' <idDefJSch> }
+
+<idDefJSch> := 	<id> '"' <defsJSch>
+			| 	<defsJSch>
+<defsJSch>	:= 	<defs> '"' <JSchD>
+			|	<JSchD>
+
+<id> ::= ID '"' ':' '"' URI '"'
+
+<defs> ::= DEFINITIONS '"' ':' '{' <kSch> <kSchL> '}'
+
+<kSchL> :=
+		|	',' <kSch> <kSchL>
+<kSch> ::= <kword> ':' '{' <JSch> '}'
+
+<JSchL> :=
+		|	',' '{' <JSch> '}' <JSchL>
+<JSch> ::= '"' <JSchD>
+<JSchD> ::= <res> <resL>
+
+<resL> :=
+		|	',' '"' <res> <resL>
+
+<res> ::= <type> | <strRes> | <numRes> | <arrRes> | <objRes> | <multRes> | <refSch> | <title> | <description>
+<type> ::= TYPE '"' ':' <typeVal>
+<typeVal> := 	'[' <typename> <typenameL> ']'
+			|	<typename>
+<typenameL>	:=
+			|	',' <typename> <typenameL>
+<typename> ::= '"' <typenameVal> '"'
+<typenameVal> ::= STRING | INTEGER | NUMBER | BOOLEAN | NULL | ARRAY | OBJECT
+
+<title> ::= TITLE '"' ':'  <string>
+<description> ::= DESCRIPTION '"' ':'  <string>
+
+<strRes> :=  <minLen> | <maxLen> | <pattern>
+<minLen> := MINLENGTH '"' ':' <n>
+<maxLen> := MAXLENGTH '"' ':' <n>
+<pattern> := PATTERN '"' ':' "regExp"
+
+<numRes> := <min> | <max> | <multiple>
+<min> := MINIMUM '"' ':' <r> <exMin>
+<exMin> :=
+		|	',' '"' EXCLUSIVEMINIMUM '"' ':' <bool>
+<max> := maximum '"' ':' <r> <exMax>
+<exMax> :=
+		|	',' '"' EXCLUSIVEMAXIMUM '"' ':' <bool>
+<multiple> := MULTIPLEOF '"' ':' <r>
+
+<arrRes> := <items> | <additems> | <minitems> | <maxitems>  | <unique>
+<items> := items '"' ':' <itemDecl>
+<itemDecl> := 	<sameitems>
+			|  	<varitems>
+<sameitems> := '{' <JSch> '}'
+<varitems> 	:= '[' '{' <JSch> '}' <JSchL> ']'
+<additems> :=  ADDITIONALITEMS '"' ':' <additionalValue>
+<additionalValue> := <bool>
+			| 	'{' <JSch> '}'
+<minitems> := MINITEMS '"' ':' <n>
+<maxitems> := MAXITEMS '"' ':' <n>
+<unique> := UNIQUEITEMS '"' ':' <bool>
+
+<objRes> := <prop> | <addprop> | <req> | <minprop> | <maxprop> | <dep> | <pattprop>
+<prop> := PROPERTIES '"' ':' '{' <kSch> <kSchL> '}'
+<addprop> := ADDITIONALPROPERTIES '"' ':' <additionalValue>
+<req> := REQUIRED '"' ':' '[' <kword> <kwordL> ']'
+<kwordL> :=
+		|	',' <kword> <kwordL>
+<minprop> := MINPROPERTIES '"' ':' <n>
+<maxprop> := MAXPROPERTIES '"' ':' <n>
+<dep> := DEPENDENCIES '"' ':' '{' <kDep> <kDepL> '}'
+<kDepL> :=
+		|	',' <kDep> <kDepL>
+<kDep> := <kword> ':' <kDepVal>
+<kDepVal> :=	'[' <kword> <kwordL> ']'
+			|	'{' <JSch> '}'
+<pattprop> := PATTERNPROPERTIES '"' ':' '{' <patSch> <patSchL> '}'
+<patSchL> :=
+			|	',' <patSch> <patSchL>
+<patSch> := "regExp" ':' '{' <JSch> '}'
+
+<multRes> := <allOf> | <anyOf>| <oneOf> | <not> | <enum>
+<anyOf> := ANYOF <multResArr>
+<allOf> := ALLOF <multResArr>
+<oneOf> := ONEOF <multResArr>
+<multResArr> := '"' ':' '[' '{' <JSch> '}' <JSchL> ']'
+<not> := NOT '"' ':' '{' <JSch> '}'
+<enum> := ENUM '"' ':' '[' <Jval> <JvalL> ']'
+<JvalL> :=
+		|	',' <Jval> <JvalL>
+<refSch> := "$ref" ':' '"' <uriRef> '"'
+<uriRef> := <addressVal> <JPointerVal>
+<addressVal> :=
+				|	<address>
+<JPointerVal> :=
+				|	'#' '/' <JPointer>
+<JPointer> := '/' <path>
+<path> := ( <unescaped> | <escaped> )
+<escaped> := ~0 | ~1
