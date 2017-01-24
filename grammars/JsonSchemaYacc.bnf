@@ -1,11 +1,11 @@
-<JSDoc> ::= { '"' <idDefJSch> }
+<JSDoc> ::= '{' '"' <idDefJSch> '}'
 
 <idDefJSch> := 	<id> '"' <defsJSch>
 			| 	<defsJSch>
 <defsJSch>	:= 	<defs> '"' <JSchD>
 			|	<JSchD>
 
-<id> ::= ID '"' ':' '"' URI '"'
+<id> ::= ID '"' ':' '"' <uri> '"'
 
 <defs> ::= DEFINITIONS '"' ':' '{' <kSch> <kSchL> '}'
 
@@ -42,13 +42,13 @@
 <min> := MINIMUM '"' ':' <r> <exMin>
 <exMin> :=
 		|	',' '"' EXCLUSIVEMINIMUM '"' ':' <bool>
-<max> := maximum '"' ':' <r> <exMax>
+<max> := MAXIMUM '"' ':' <r> <exMax>
 <exMax> :=
 		|	',' '"' EXCLUSIVEMAXIMUM '"' ':' <bool>
 <multiple> := MULTIPLEOF '"' ':' <r>
 
 <arrRes> := <items> | <additems> | <minitems> | <maxitems>  | <unique>
-<items> := items '"' ':' <itemDecl>
+<items> := ITEMS '"' ':' <itemDecl>
 <itemDecl> := 	<sameitems>
 			|  	<varitems>
 <sameitems> := '{' <JSch> '}'
@@ -97,3 +97,4 @@
 <JPointer> := '/' <path>
 <path> := ( <unescaped> | <escaped> )
 <escaped> := ~0 | ~1
+<uri> : = '#'

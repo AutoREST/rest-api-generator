@@ -6,123 +6,130 @@ import java.util.Stack;
 %}
 
 
-%token DEFINITIONS, LITERAL, NOT, ALLOF, ANYOF, ENUM, REF, TYPE
-%token STRING, MINLEN, INT, MAXLEN, PATTERN, NUMBER, INTEGER, MINIMUM
-%token DEC, EXMINIMUM, MAXIMUM, EXMAXIMUM, MULTIPLEOF, OBJECT, PROPERTIES
-%token ADDITIONALPROP, REQUIRED, PATTERNPROP, ARRAY, ITEMS, MINITEMS, MAXITEMS, UNIQUEITEMS
-%token ID, URI
-%token TRUE, FALSE
+%token ID, URI, DEFINITIONS, TYPE
+%token STRING, INTEGER, NUMBER, BOOLEAN, NULL, ARRAY, OBJECT
+%token TITLE, DESCRIPTION
+%token MINLENGTH, MAXLENGTH, PATTERN, MINIMUM, EXCLUSIVEMINIMUM, MAXIMUM, EXCLUSIVEMAXIMUM, MULTIPLEOF
+%token ITEMS, ADDITIONALITEMS, MINITEMS, MAXITEMS, UNIQUEITEMS
+%token PROPERTIES, ADDITIONALPROPERTIES, REQUIRED, MINPROPERTIES, MAXPROPERTIES, DEPENDENCIES, PATTERNPROPERTIES
+%token ANYOF, ALLOF, ONEOF, NOT, ENUM
+%token TRUE, FALSE, INT, DEC, LITERAL
 
 %type <sval> LITERAL
+%type <sval> string
 %type <sval> DEC
 %type <ival> INT
 
 %%
 
-JSDoc : '{' '"' idDefsSch '}';
+JSDoc : '{' '"' idDefJSch '}' ;
 
-idDefsSch :	idSch defs JSch
-		|	defs JSch
-		|	JSchD ;
+idDefJSch 	:	id '"' defsJSch
+			|	defsJSch ;
+defsJSch	:	defs '"' JSchD
+			|	JSchD ;
 
-idSch : ID '"' ':' '"' URI '"' ',' '"' ;
+id : ID '"' ':' '"' uri '"' ;
 
-defs :
-	|	DEFINITIONS '"' ':' '{' defsL '}' ','
-	;
-defsL : kSch defsTail ;
-defsTail :
-		| ',' kSch defsTail ;
+defs : DEFINITIONS '"' ':' '{' kSch kSchL '}' ;
 
-kSch : '"' LITERAL '"' ':' '{' JSch '}' ;
-
-JSch : 	'"' JSchD ;
-JSchD :	res resL ;
-resL :
-	| ',' res resL ;
-res: 	typeDecl
-	|	refSch
-	|	not
-	|	allOf
-	|	anyOf
-	|	enum	;
-
-not : NOT '"' ':' '{' JSch '}' ;
-allOf : ALLOF '"' ':' '[' JSchL ']' ;
-anyOf : ANYOF '"' '[' JSchL ']' ;
-enum : ENUM '"' ':' '[' Jval JvalL ']' ;
-
-JSchL : '{' JSch '}' JSchLTail ;
-JSchLTail :
-			| ',' '{' JSch '}' JSchLTail ;
-
-JvalL :
-		| ',' Jval JvalL;
-
-refSch : REF '"' ':' '"' '#' JPointer '"'
-
-typeDecl :	TYPE '"' ':' '"' typeSch;
-typeSch : 	STRING '"' strResL
-		|	NUMBER '"' numResL
-		|	INTEGER '"' numResL
-		|	OBJECT '"' objResL
-		|	ARRAY '"' arrResL ;
-
-strResL :
-		| ',' '"' strRes strResL;
-strRes : 	minLength
-		|	maxLength
-		|	pattern		;
-
-minLength : MINLEN '"' ':' '"' INT '"' ;
-maxLength : MAXLEN '"' ':' '"' INT '"' ;
-pattern : PATTERN '"' ':' '"' regExp '"' ;
-
-numResL :
-		| ',' '"' numRes numResL ;
-numRes : 	min
-		|	exMin
-		|	max
-		|	exMax
-		|	mult	;
-min : MINIMUM '"' ':' DEC;
-exMin : EXMINIMUM '"' ':' TRUE;
-max : MAXIMUM '"' ':' DEC;
-exMax : EXMAXIMUM '"' ':' TRUE;
-mult : MULTIPLEOF '"' ':' DEC;
-
-objResL :
-		| ',' '"' objRes objResL ;
-objRes :	prop
-		|	addPr
-		|	patPr
-		|	req	;
-prop : PROPERTIES '"' '{' kSch kSchL '}' ;
 kSchL :
-		| ',' kSch kSchL;
-kSch : '"' LITERAL '"' ':' '{' JSch '}' ;
-addPr : ADDITIONALPROP '"' ':' FALSE ;
-req : REQUIRED '"' ':' '[' '"' LITERAL '"' litL ']' ;
-litL : ',' '"' LITERAL '"' litL | ;
-patPr : PATTERNPROP '"' ':' '{' patSch patSchL '}' ;
-patSchL : ',' patSch patSchL ;
-patSch : '"' regExp '"' ':' '{' JSch '}' ;
+		|	',' kSch kSchL ;
+kSch : kword ':' '{' JSch '}' ;
 
-arrResL :
-		| ',' '"' arrRes arrResL;
-arrRes : 	itemo
-		|	itema
-		|	minIt
-		|	maxIt
-		|	unique	;
-itemo : ITEMS '"' ':' '{' JSch '}' ;
-itema : ITEMS '"' ':' '[' JSchL ']' ;
-minIt : MINITEMS '"' ':' INT ;
-maxIt : MAXITEMS '"' ':' INT ;
-unique : UNIQUEITEMS '"' ':' TRUE ;
+JSchL :
+		|	',' '{' JSch '}' JSchL ;
+JSch : '"' JSchD ;
+JSchD : res resL ;
 
-regExp : 'r' ;
+kword : string { message("kword: " + $1); }
 
+resL :
+		|	',' '"' res resL ;
+
+res : type | strRes | arrRes | objRes | multRes | refSch | title | description | numRes ;
+type : TYPE '"' ':' typeVal ;
+typeVal : 	'[' typename typenameL ']'
+			|	typename ;
+typenameL	:
+			|	',' typename typenameL ;
+typename : '"' typenameVal '"' ;
+typenameVal : STRING | INTEGER | NUMBER | BOOLEAN | NULL | ARRAY | OBJECT ;
+
+title : TITLE '"' ':'  string ;
+description : DESCRIPTION '"' ':'  string ;
+
+strRes :  minLen | maxLen | pattern ;
+minLen : MINLENGTH '"' ':' INT ;
+maxLen : MAXLENGTH '"' ':' INT ;
+pattern : PATTERN '"' ':' "regExp" ;
+
+numRes : min exMin | max exMax | multiple ;
+min : MINIMUM '"' ':' DEC  ;
+exMin :
+		|	',' '"' EXCLUSIVEMINIMUM '"' ':' bool ;
+max : MAXIMUM '"' ':' DEC  ;
+exMax :
+		|	',' '"' EXCLUSIVEMAXIMUM '"' ':' bool ;
+multiple : MULTIPLEOF '"' ':' DEC ;
+
+arrRes : items | additems | minitems | maxitems  | unique ;
+items : ITEMS '"' ':' itemDecl ;
+itemDecl : 	sameitems
+			|  	varitems ;
+sameitems	: '{' JSch '}' ;
+varitems 	: '[' '{' JSch '}' JSchL ']' ;
+additems 	:  ADDITIONALITEMS '"' ':' additionalValue ;
+additionalValue : bool
+				| 	'{' JSch '}' ;
+minitems : MINITEMS '"' ':' INT ;
+maxitems : MAXITEMS '"' ':' INT ;
+unique : UNIQUEITEMS '"' ':' bool ;
+
+objRes : prop | addprop | req | minprop | maxprop | dep | pattprop ;
+prop : PROPERTIES '"' ':' '{' kSch kSchL '}' ;
+addprop : ADDITIONALPROPERTIES '"' ':' additionalValue ;
+req : REQUIRED '"' ':' '[' kword kwordL ']' ;
+kwordL :
+		|	',' kword kwordL ;
+minprop : MINPROPERTIES '"' ':' INT ;
+maxprop : MAXPROPERTIES '"' ':' INT ;
+dep : DEPENDENCIES '"' ':' '{' kDep kDepL '}' ;
+kDepL :
+		|	',' kDep kDepL ;
+kDep : kword ':' kDepVal ;
+kDepVal :		'[' kword kwordL ']'
+			|	'{' JSch '}' ;
+pattprop : PATTERNPROPERTIES '"' ':' '{' patSch patSchL '}' ;
+patSchL :
+			|	',' patSch patSchL ;
+patSch : "regExp" ':' '{' JSch '}' ;
+
+multRes : allOf | anyOf| oneOf | not | enum ;
+anyOf : ANYOF multResArr ;
+allOf : ALLOF multResArr ;
+oneOf : ONEOF multResArr ;
+multResArr : '"' ':' '[' '{' JSch '}' JSchL ']' ;
+not : NOT '"' ':' '{' JSch '}' ;
+enum : ENUM '"' ':' '[' Jval JvalL ']' ;
+JvalL :
+		|	',' Jval JvalL ;
+refSch : "$ref" ':' '"' uriRef '"' ;
+uriRef : addressVal JPointerVal ;
+addressVal :
+				|	address ;
+JPointerVal :
+				|	'#' '/' JPointer ;
+JPointer : '/' path ;
+path : escaped ;
+escaped : '~' '0' | '~' '1' ;
+uri : '#' ;
+bool : TRUE | FALSE ;
+string : '"' LITERAL '"' { $$ = "\"" + $2 + "\"";};
+Jval : string | INT | DEC | array | object | bool | NULL ;
+array : '[' Jval ']' ;
+object : '{' kword ':' Jval '}' ;
+address : 'w' ;
 %%
 
 	private Yylex lexer;

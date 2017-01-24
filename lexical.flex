@@ -47,38 +47,46 @@ NL  = \n | \r | \r\n
 {DEC}					{ yyparser.yylval = new JSchParserVal(yytext());
 							return JSchParser.DEC; }
 
-definitions				{ return JSchParser.DEFINITIONS;     }
-not						{ return JSchParser.NOT; }
-allOf					{ return JSchParser.ALLOF; }
-anyOf					{ return JSchParser.ANYOF; }
-enum					{ return JSchParser.ENUM; }
-\$ref					{ return JSchParser.REF; }
+id						{ return JSchParser.ID; }
+uri						{ return JSchParser.URI; }
+definitions				{ return JSchParser.DEFINITIONS; }
 type					{ return JSchParser.TYPE; }
 string					{ return JSchParser.STRING; }
-minLength				{ return JSchParser.MINLEN; }
-maxLength				{ return JSchParser.MAXLEN; }
-pattern					{ return JSchParser.PATTERN; }
-number					{ return JSchParser.NUMBER; }
 integer					{ return JSchParser.INTEGER; }
-minimum					{ return JSchParser.MINIMUM; }
-exclusiveMinimum		{ return JSchParser.EXMINIMUM; }
-maximum					{ return JSchParser.MAXIMUM; }
-exclusiveMaximum		{ return JSchParser.EXMAXIMUM; }
-multipleOf				{ return JSchParser.MULTIPLEOF; }
-object					{ return JSchParser.OBJECT; }
-properties				{ return JSchParser.PROPERTIES; }
-additionalProperties	{ return JSchParser.ADDITIONALPROP; }
-required				{ return JSchParser.REQUIRED; }
-patternProperties		{ return JSchParser.PATTERNPROP; }
+number					{ return JSchParser.NUMBER; }
+boolean					{ return JSchParser.BOOLEAN; }
+null					{ return JSchParser.NULL; }
 array					{ return JSchParser.ARRAY; }
+object					{ return JSchParser.OBJECT; }
+title					{ return JSchParser.TITLE; }
+description				{ return JSchParser.DESCRIPTION; }
+minLength				{ return JSchParser.MINLENGTH; }
+maxLength				{ return JSchParser.MAXLENGTH; }
+pattern					{ return JSchParser.PATTERN; }
+minimum					{ return JSchParser.MINIMUM; }
+exclusiveMinimum		{ return JSchParser.EXCLUSIVEMINIMUM; }
+maximum					{ return JSchParser.MAXIMUM; }
+exclusiveMaximum		{ return JSchParser.EXCLUSIVEMAXIMUM; }
+multipleOf				{ return JSchParser.MULTIPLEOF; }
 items					{ return JSchParser.ITEMS; }
+additionalItems			{ return JSchParser.ADDITIONALITEMS; }
 minItems				{ return JSchParser.MINITEMS; }
 maxItems				{ return JSchParser.MAXITEMS; }
 uniqueItems				{ return JSchParser.UNIQUEITEMS; }
+properties				{ return JSchParser.PROPERTIES; }
+additionalProperties	{ return JSchParser.ADDITIONALPROPERTIES; }
+required				{ return JSchParser.REQUIRED; }
+minProperties			{ return JSchParser.MINPROPERTIES; }
+maxProperties			{ return JSchParser.MAXPROPERTIES; }
+dependencies			{ return JSchParser.DEPENDENCIES; }
+patternProperties		{ return JSchParser.PATTERNPROPERTIES; }
+anyOf					{ return JSchParser.ANYOF; }
+allOf					{ return JSchParser.ALLOF; }
+oneOf					{ return JSchParser.ONEOF; }
+not						{ return JSchParser.NOT; }
+enum					{ return JSchParser.ENUM; }
 true					{ return JSchParser.TRUE; }
 false					{ return JSchParser.FALSE; }
-id						{ return JSchParser.ID; }
-www.com					{ return JSchParser.URI; }
 
 [a-zA-Z_0-9]+			{ 	yyparser.yylval = new JSchParserVal(yytext().substring(0, yylength()));
 							return JSchParser.LITERAL;   }
