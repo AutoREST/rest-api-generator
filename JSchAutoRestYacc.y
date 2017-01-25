@@ -114,6 +114,12 @@ not : NOT '"' ':' '{' JSch '}' ;
 enum : ENUM '"' ':' '[' Jval JvalL ']' ;
 JvalL :
 		|	',' Jval JvalL ;
+bool : TRUE | FALSE ;
+string : '"' LITERAL '"' { $$ = $2 ;};
+Jval : string | INT | DEC | array | object | bool | NULL ;
+array : '[' Jval ']' ;
+object : '{' kword ':' Jval '}' ;
+
 refSch : "$ref" ':' '"' uriRef '"' ;
 uriRef : addressVal JPointerVal ;
 addressVal :
@@ -124,12 +130,8 @@ JPointer : '/' path ;
 path : escaped ;
 escaped : '~' '0' | '~' '1' ;
 uri : '#' ;
-bool : TRUE | FALSE ;
-string : '"' LITERAL '"' { $$ = $2 ;};
-Jval : string | INT | DEC | array | object | bool | NULL ;
-array : '[' Jval ']' ;
-object : '{' kword ':' Jval '}' ;
 address : 'w' ;
+
 %%
 
 	private Yylex lexer;
