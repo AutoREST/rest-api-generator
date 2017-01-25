@@ -66,10 +66,10 @@ pattern : PATTERN '"' ':' "regExp" ;
 
 numRes : min exMin | max exMax | multiple ;
 min : MINIMUM '"' ':' DEC  ;
-exMin :
+exMin : 	',' '"' res
 		|	',' '"' EXCLUSIVEMINIMUM '"' ':' bool ;
 max : MAXIMUM '"' ':' DEC  ;
-exMax :
+exMax : 	',' '"' res
 		|	',' '"' EXCLUSIVEMAXIMUM '"' ':' bool ;
 multiple : MULTIPLEOF '"' ':' DEC ;
 
