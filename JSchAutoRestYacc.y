@@ -24,9 +24,9 @@ import java.util.Stack;
 
 JSDoc : '{' '"' idDefJSch '}' ;
 
-idDefJSch 	:	id '"' defsJSch
+idDefJSch 	:	id ',' '"' defsJSch
 			|	defsJSch ;
-defsJSch	:	defs '"' JSchD
+defsJSch	:	defs  ',' '"' JSchD
 			|	JSchD ;
 
 id : ID '"' ':' '"' uri '"' ;
@@ -125,7 +125,7 @@ path : escaped ;
 escaped : '~' '0' | '~' '1' ;
 uri : '#' ;
 bool : TRUE | FALSE ;
-string : '"' LITERAL '"' { $$ = "\"" + $2 + "\"";};
+string : '"' LITERAL '"' { $$ = $2 ;};
 Jval : string | INT | DEC | array | object | bool | NULL ;
 array : '[' Jval ']' ;
 object : '{' kword ':' Jval '}' ;

@@ -1,8 +1,8 @@
 <JSDoc> ::= '{' '"' <idDefJSch> '}'
 
-<idDefJSch> := 	<id> '"' <defsJSch>
+<idDefJSch> := 	<id> ',' '"' <defsJSch>
 			| 	<defsJSch>
-<defsJSch>	:= 	<defs> '"' <JSchD>
+<defsJSch>	:= 	<defs> ',' '"' <JSchD>
 			|	<JSchD>
 
 <id> ::= ID '"' ':' '"' <uri> '"'
