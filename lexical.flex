@@ -18,8 +18,9 @@
 
 %}
 
-NUM = [0-9]+
-DEC = [0-9]+(\.[0-9]+)?
+digit 	= [0-9]
+integer = {digit}+
+real 	= ({digit}+[.]{digit}+)|({integer})
 NL  = \n | \r | \r\n
 
 %%
@@ -42,10 +43,10 @@ NL  = \n | \r | \r\n
 "\[" |
 "\]"					{ return (int) yycharat(0); }
 
-{NUM}					{ yyparser.yylval = new JSchParserVal(yytext());
+{real}					{ yyparser.yylval = new JSchParserVal(yytext());
+							if(yyparser.yylval.sval.indexOf(".")>0)
+								return JSchParser.DEC;
 							return JSchParser.INT; }
-{DEC}					{ yyparser.yylval = new JSchParserVal(yytext());
-							return JSchParser.DEC; }
 
 id						{ return JSchParser.ID; }
 uri						{ return JSchParser.URI; }

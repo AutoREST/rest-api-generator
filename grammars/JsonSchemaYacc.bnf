@@ -21,7 +21,8 @@
 <resL> :=
 		|	',' '"' <res> <resL>
 
-<res> ::= <type> | <strRes> | <numRes> | <arrRes> | <objRes> | <multRes> | <refSch> | <title> | <description>
+<res> ::= <type> | <typeRes> | <multRes> | <refSch> | <title> | <description>
+<typeRes> := <strRes> | <numRes> | <arrRes> | <objRes>
 <type> ::= TYPE '"' ':' <typeVal>
 <typeVal> := 	'[' <typename> <typenameL> ']'
 			|	<typename>

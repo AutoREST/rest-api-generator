@@ -1,6 +1,7 @@
 
 %{
 import java.io.*;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.Stack;
 %}
@@ -17,8 +18,14 @@ import java.util.Stack;
 
 %type <sval> LITERAL
 %type <sval> string
+%type <sval> typeRes
+%type <sval> strRes
+%type <sval> arrRes
+%type <sval> objRes
+%type <sval> numRes
 %type <sval> DEC
 %type <ival> INT
+%type <obj> typenameVal
 
 %%
 
@@ -47,33 +54,53 @@ kword : string { message("kword: " + $1); }
 resL :
 		|	',' '"' res resL ;
 
-res : type | strRes | arrRes | objRes | multRes | refSch | title | description | numRes ;
-type : TYPE '"' ':' typeVal ;
+res : type | refSch | title | description | multRes | typeRes { if(!validKeyword($1)) return 1; };
+typeRes : strRes { $$ = $1; }
+		| arrRes { $$ = $1; }
+		| objRes { $$ = $1; }
+		| numRes { $$ = $1; } ;
+type : TYPE '"' ':' { currentTypes = new ArrayList<>(); } typeVal ;
 typeVal : 	'[' typename typenameL ']'
 			|	typename ;
 typenameL	:
 			|	',' typename typenameL ;
-typename : '"' typenameVal '"' ;
-typenameVal : STRING | INTEGER | NUMBER | BOOLEAN | NULL | ARRAY | OBJECT ;
+typename : '"' typenameVal '"' { currentTypes.add($2); };
+typenameVal : STRING { $$ = JSONType.STRING; }
+			| INTEGER { $$ = JSONType.INTEGER; }
+			| NUMBER { $$ = JSONType.NUMBER; }
+			| BOOLEAN { $$ = JSONType.BOOLEAN; }
+			| NULL { $$ = JSONType.NULL; }
+			| ARRAY { $$ = JSONType.ARRAY; }
+			| OBJECT { $$ = JSONType.OBJECT; } ;
 
 title : TITLE '"' ':'  string ;
 description : DESCRIPTION '"' ':'  string ;
 
-strRes :  minLen | maxLen | pattern ;
+strRes :  minLen { $$ = "minLength"; }
+		| maxLen { $$ = "maxLength"; }
+		| pattern{ $$ = "pattern"; } ;
 minLen : MINLENGTH '"' ':' INT ;
 maxLen : MAXLENGTH '"' ':' INT ;
 pattern : PATTERN '"' ':' "regExp" ;
 
-numRes : min exMin | max exMax | multiple ;
-min : MINIMUM '"' ':' DEC  ;
-exMin : 	',' '"' res
+numRes : 	min exMin { $$ = "minimum"; }
+		| 	max exMax { $$ = "maximum"; }
+		| 	multiple { $$ = "multipleOf"; };
+min : MINIMUM '"' ':' real ;
+exMin :		'}' { lexer.yypushback(1); }
+		|	',' '"' res
 		|	',' '"' EXCLUSIVEMINIMUM '"' ':' bool ;
-max : MAXIMUM '"' ':' DEC  ;
-exMax : 	',' '"' res
+max : MAXIMUM '"' ':' real  ;
+exMax : 	'}' { lexer.yypushback(1); }
+		|	',' '"' res
 		|	',' '"' EXCLUSIVEMAXIMUM '"' ':' bool ;
-multiple : MULTIPLEOF '"' ':' DEC ;
+multiple : MULTIPLEOF '"' ':' real ;
 
-arrRes : items | additems | minitems | maxitems  | unique ;
+arrRes : 	items { $$ = "items"; }
+		| 	additems { $$ = "additionalItems"; }
+		| 	minitems { $$ = "minItems"; }
+		| 	maxitems { $$ = "maxItems"; }
+		| 	unique { $$ = "unique"; };
 items : ITEMS '"' ':' itemDecl ;
 itemDecl : 	sameitems
 			|  	varitems ;
@@ -86,7 +113,13 @@ minitems : MINITEMS '"' ':' INT ;
 maxitems : MAXITEMS '"' ':' INT ;
 unique : UNIQUEITEMS '"' ':' bool ;
 
-objRes : prop | addprop | req | minprop | maxprop | dep | pattprop ;
+objRes : 	prop { $$ = "properties"; }
+		| 	addprop { $$ = "additionalProperties"; }
+		| 	req { $$ = "required"; }
+		| 	minprop { $$ = "minProperties"; }
+		| 	maxprop { $$ = "maxProperties"; }
+		| 	dep { $$ = "dependencies"; }
+		| 	pattprop { $$ = "patternProperties"; };
 prop : PROPERTIES '"' ':' '{' kSch kSchL '}' ;
 addprop : ADDITIONALPROPERTIES '"' ':' additionalValue ;
 req : REQUIRED '"' ':' '[' kword kwordL ']' ;
@@ -116,7 +149,8 @@ JvalL :
 		|	',' Jval JvalL ;
 bool : TRUE | FALSE ;
 string : '"' LITERAL '"' { $$ = $2 ;};
-Jval : string | INT | DEC | array | object | bool | NULL ;
+Jval : string | real | array | object | bool | NULL ;
+real : INT | DEC;
 array : '[' Jval ']' ;
 object : '{' kword ':' Jval '}' ;
 
@@ -135,12 +169,15 @@ address : 'w' ;
 %%
 
 	private Yylex lexer;
+	private String file;
+	private boolean verbose;
 
 	//private Stack<Integer> pRot = new Stack<Integer>();
 	//private int proxRot = 1;
 
 	//public static int ARRAY = 100;
-
+	private List<Object> currentTypes = null;
+	private JSchSemantics semValidator;
 
 	private int yylex () {
 		int yyl_return = -1;
@@ -163,31 +200,78 @@ address : 'w' ;
 		}
 	}
 
+	public JSchParser(String file) throws IOException {
+		this(new FileReader(file));
+		this.file = file;
+	}
+
 	public JSchParser(Reader r) {
 		lexer = new Yylex(r, this);
+		semValidator = new JSchSemantics();
+		this.verbose = false;
 	}
 
 	public void setDebug(boolean debug) {
 		yydebug = debug;
 	}
 
+	public void setVerbose(boolean verbose) {
+		this.verbose = verbose;
+	}
+
+	public boolean parse(){
+		boolean result = yyparse() == 0;
+		if(verbose)
+			System.out.println("["+file+"] : Parse = " + result);
+		return result;
+	}
+
 	public static void main(String args[]) throws IOException {
-		JSchParser yyparser;
 		if ( args.length > 0 ) {
-			// parse a file
-			yyparser = new JSchParser(new FileReader(args[0]));
-			yyparser.yyparse();
+			JSchParser yyparser;
+			yyparser = new JSchParser(args[0]);
+			if(args.length > 1){
+				for(int i=1; i < args.length; i++){
+					if(args[i].equals("-v")){
+						yyparser.setVerbose(true);
+					}
+				}
+			}
+			yyparser.parse();
 		}
 		else {
-			// interactive mode
 			System.out.println("\n\tFormat: java JSchParser inputFile\n");
 		}
 	}
 
-	public void testOutput(String test){
-		System.out.println("\n\tHello " + test);
-	}
-
 	public static void message(String msg){
 		System.out.println(msg);
+	}
+
+	public void printCurrentTypes(){
+		for(Object t : currentTypes)
+			System.out.println(t.toString());
+	}
+
+	public List<JSONType> typesList(){
+		List<JSONType> types = new ArrayList<>();
+		for(Object t : currentTypes)
+			types.add((JSONType)t);
+		return types;
+	}
+
+	private boolean validKeyword(String keyword){
+		List<JSONType> types = typesList();
+		boolean valid = semValidator.Compatible(types, keyword);
+		if(yydebug){
+			String sType = "[";
+			for(JSONType t : types)
+				sType += t.toString();
+			sType+="]";
+			if(valid)
+				System.out.println(keyword + " is valid for " + sType);
+			else
+				System.out.println(keyword + " is not valid for " + sType);
+		}
+		return valid;
 	}

@@ -5,8 +5,6 @@ JFLEX  = java -jar JFlex.jar
 BYACCJ = ./yacc.linux -tv -J -Jclass=JSchParser
 JAVAC  = javac
 
-# targets:
-
 all: JSchParser.class
 
 run: JSchParser.class
