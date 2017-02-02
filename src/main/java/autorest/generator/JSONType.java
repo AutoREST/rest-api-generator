@@ -1,3 +1,5 @@
+package autorest.generator;
+
 public enum JSONType {
 
     STRING("string"),

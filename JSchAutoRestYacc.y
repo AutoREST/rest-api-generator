@@ -220,7 +220,7 @@ address : 'w' ;
 	}
 
 	public boolean parse(){
-		boolean result = yyparse() == 0;
+		boolean result = (yyparse() == 0);
 		if(verbose)
 			System.out.println("["+file+"] : Parse = " + result);
 		return result;

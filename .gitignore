@@ -2,4 +2,5 @@ JSchParser*.java
 Yylex.java
 *.class
 *.output
-dist/
+*~
+target/

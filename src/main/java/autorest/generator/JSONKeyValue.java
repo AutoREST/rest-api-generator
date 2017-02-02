@@ -1,3 +1,5 @@
+package autorest.generator;
+
 public class JSONKeyValue {
 	public String key;
 	public Object value;

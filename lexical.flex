@@ -1,3 +1,4 @@
+package autorest.generator;
 %%
 
 %byaccj
