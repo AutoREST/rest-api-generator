@@ -1,0 +1,23 @@
+{
+	"definitions" : {
+		"name" : {
+			"type" : "string",
+			"maxLength" : 50
+		}
+	},
+	"type" : "object",
+	"title" : "Person",
+	"description" : "Object that represents a person",
+	"properties" : {
+		"age" : {
+			"type" : "integer",
+			"minimum" : 1
+		},
+		"firstName" : {
+			"$ref" : "#/definitions/name"
+		},
+		"option" : {
+			"enum" : ["alien",42,{"pernas":2,"olhos":2},false,true,[1,"qwe",3.2,{"dedos":null}],1.2]
+		}
+	}
+}

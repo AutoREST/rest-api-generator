@@ -1,0 +1,17 @@
+{
+	"definitions" : {
+		"name" : {
+			"type" : "string",
+			"maxLength" : 50
+		}
+	},
+	"type" : "object",
+	"title" : "Person",
+	"description" : "Object that represents a person",
+	"properties" : {
+		"age" : {
+			"type" : "integer",
+			"minimum" : 1
+		}
+	}
+}
