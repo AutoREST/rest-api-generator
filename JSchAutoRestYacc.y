@@ -46,16 +46,22 @@ import java.util.HashMap;
 
 %%
 
-JSDoc : '{' '"' idDefJSch '}' ;
+JSDoc : '{' '"' idDefJSch '}' 	{	if(verbose){
+										if(mainJSchema != null)
+											message(mainJSchema.toString());
+										if(definitionsMap != null)
+											message(definitionsMap.toString());
+									}
+								} ;
 
 idDefJSch 	:	id ',' '"' defsJSch
 			|	defsJSch ;
-defsJSch	:	defs  ',' '"' JSchD { if(verbose) message($4.toString()); };
-			|	JSchD { if(verbose) message($1.toString()); };
+defsJSch	:	defs  ',' '"' JSchD { mainJSchema = (JSchRestriction)$4; };
+			|	JSchD { mainJSchema = (JSchRestriction)$1;};
 
 id : ID '"' ':' '"' uri '"' ;
 
-defs : DEFINITIONS '"' ':' '{' { newMap(); definitionsMap=(Map)tempMap; } kSch kSchL '}' { lastMap(); if(verbose) message(definitionsMap.toString());} ;
+defs : DEFINITIONS '"' ':' '{' { newMap(); definitionsMap=(Map)tempMap; } kSch kSchL '}' { lastMap(); } ;
 
 kSchL :
 		|	',' kSch kSchL ;
@@ -210,17 +216,19 @@ address : 'w' ;
 	//private int proxRot = 1;
 
 	//public static int ARRAY = 100;
+	private PFSHandler pfsHandler;
 	private JSchSemantics semValidator;
 	private Stack<JSchRestriction> stackJSch;
 	private JSchRestriction cJSch;
 	private List<Object> tempList;
 	private Stack<List<Object>> stackLists;
 	private Map<String, JSchRestriction> definitionsMap;
+	private JSchRestriction mainJSchema;
 	private Map<String, Object> tempMap;
 	private Stack<Map<String, Object>> stackMaps;
 	private JSchDependence tempDep;
 	private Stack<JSchDependence> stackDeps;
-	public Boolean expectLiteral = false;
+	public Boolean expectLiteral;
 
 	private int yylex () {
 		int yyl_return = -1;
@@ -252,10 +260,20 @@ address : 'w' ;
 		lexer = new Yylex(r, this);
 		semValidator = new JSchSemantics();
 		this.verbose = false;
+	}
+
+	private void initialize(){
 		stackJSch = new Stack<>();
 		stackLists = new Stack<>();
 		stackMaps = new Stack<>();
 		stackDeps = new Stack<>();
+		definitionsMap = null;
+		mainJSchema = null;
+		cJSch = null;
+		tempList = null;
+		tempMap = null;
+		tempDep = null;
+		expectLiteral = false;
 	}
 
 	public void setDebug(boolean debug) {
@@ -267,10 +285,27 @@ address : 'w' ;
 	}
 
 	public boolean parse(){
+		initialize();
 		boolean result = (yyparse() == 0);
 		if(verbose)
 			System.out.println("["+file+"] : Parse = " + result);
+		if(result){
+			try{
+				pfsHandler = new PFSHandler(definitionsMap, mainJSchema);
+			}
+			catch(Exception ex){
+				pfsHandler = null;
+				System.out.println(ex);
+			}
+		}
+		else{
+			pfsHandler = null;
+		}
 		return result;
+	}
+
+	public PFSHandler getPFSHandler(){
+		return pfsHandler;
 	}
 
 	public static void main(String args[]) throws IOException {

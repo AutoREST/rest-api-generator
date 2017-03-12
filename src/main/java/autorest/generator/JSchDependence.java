@@ -2,8 +2,9 @@ package autorest.generator;
 import java.util.List;
 
 import java.util.ArrayList;
+import java.io.Serializable;
 
-public class JSchDependence {
+public class JSchDependence implements Serializable{
 	public List<String> kwords = null;
 	public JSchRestriction jsch = null;
 
@@ -14,6 +15,12 @@ public class JSchDependence {
 
 	public JSchDependence(){
 
+	}
+
+	public Boolean hasRefs(){
+		if(this.jsch != null && this.jsch.hasRefs())
+			return true;
+		return false;
 	}
 
 	public String toString(){

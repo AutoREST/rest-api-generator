@@ -3,6 +3,31 @@
 		"name" : {
 			"type" : "string",
 			"maxLength" : 50
+		},
+		"lastName" : {
+			"$ref" : "#/definitions/name"
+		},
+		"resource" : {
+			"type" : "object",
+			"properties" : {
+				"name":{
+					"$ref" : "#/definitions/name"
+				}
+			}
+		},
+		"people" : {
+			"type" : "array",
+			"items" : {
+				"type" : "object",
+				"properties" : {
+					"name" : {
+						"$ref":"#/definitions/name"
+					},
+					"resource" : {
+						"$ref":"#/definitions/resource"
+					}
+				}
+			}
 		}
 	},
 	"type" : "object",
@@ -15,6 +40,12 @@
 		},
 		"firstName" : {
 			"$ref" : "#/definitions/name"
+		},
+		"resource" : {
+			"$ref" : "#/definitions/resource"
+		},
+		"resourceName" : {
+			"$ref" : "#/definitions/resource/properties/name"
 		},
 		"option" : {
 			"enum" : ["alien",42,{"pernas":2,"olhos":2},false,true,[1,"qwe",3.2,{"dedos":null}],1.2]
