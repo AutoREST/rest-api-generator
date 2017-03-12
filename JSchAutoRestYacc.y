@@ -308,24 +308,6 @@ address : 'w' ;
 		return pfsHandler;
 	}
 
-	public static void main(String args[]) throws IOException {
-		if ( args.length > 0 ) {
-			JSchParser yyparser;
-			yyparser = new JSchParser(args[0]);
-			if(args.length > 1){
-				for(int i=1; i < args.length; i++){
-					if(args[i].equals("-v")){
-						yyparser.setVerbose(true);
-					}
-				}
-			}
-			yyparser.parse();
-		}
-		else {
-			System.out.println("\n\tFormat: java JSchParser inputFile\n");
-		}
-	}
-
 	public static void message(String msg){
 		System.out.println(msg);
 	}
