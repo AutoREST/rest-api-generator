@@ -1,0 +1,43 @@
+{
+    "additionalProperties": false,
+    "definitions": {
+        "avaliacao": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "allOf": [{
+                    "properties": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "additionalProperties": false,
+                            "properties": {
+                                "matriculaAluno": {
+                                    "type": "integer"
+                                },
+                                "numTurma": {
+                                    "type": "integer"
+                                }
+                            },
+                            "dependencies": {},
+                            "required": ["matriculaAluno", "numTurma"]
+                        },
+                        "uniqueItems": true
+                    }
+                }, {
+                    "properties": {
+                        "notaG1": {
+                            "type": "integer"
+                        },
+                        "notaG2": {
+                            "type": "integer"
+                        },
+                        "faltas": {
+                            "type": "integer"
+                        }
+                    }
+                }]
+            }
+        }
+    }
+}

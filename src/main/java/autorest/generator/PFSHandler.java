@@ -26,6 +26,14 @@ public class PFSHandler {
 		this.resolveMessage = "Didn't tried to resolve.";
 	}
 
+	public Map<String, JSchRestriction> getDefinitions(){
+		return this.defs;
+	}
+
+	public JSchRestriction getMainJSchema(){
+		return this.mJSch;
+	}
+
 	public String getResolveMessage(){
 		return this.resolveMessage;
 	}

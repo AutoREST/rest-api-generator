@@ -1,0 +1,17 @@
+{
+    "turma": {
+        "numTurma_id": 128,
+        "semestre": 2,
+        "horario": 18,
+        "professor_id": 1,
+        "disciplina_id":123,
+        "alunos": [{
+            "matriculaAluno_id": 1,
+            "avaliacao":{
+                "notaG1": 5,
+                "notaG2": 5,
+                "faltas": 3
+            }
+        }]
+    }
+}

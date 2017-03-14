@@ -1,0 +1,13 @@
+{
+	"disciplina": {
+        "codCred_id": 123,
+        "nome": "Introdução",
+        "conteudos": [{
+            "titulo": "Unidade 1",
+            "descricao": "Conteudos dos 3 primeiros capitulos"
+        }, {
+            "titulo": "Unidade 2",
+            "descricao": "Conteudos dos 3 ultimos capitulos"
+        }]
+    }
+}

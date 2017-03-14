@@ -1,0 +1,151 @@
+{
+    "definitions": {
+        "avaliacao": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "notaG1": {
+                    "type": "number"
+                },
+                "notaG2": {
+                    "type": "number"
+                },
+                "faltas": {
+                    "type": "integer"
+                }
+            }
+        },
+        "conteudo": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "titulo": {
+                    "type": "string"
+                },
+                "descricao": {
+                    "type": "string"
+                }
+            }
+        },
+        "aluno": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "matriculaAluno_id": {
+                    "type": "integer"
+                },
+                "nome": {
+                    "type": "string"
+                },
+                "avaliacao": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "avaliacao" : {
+                                "$ref" : "#/definitions/avaliacao"
+                            }
+                        }
+                    }
+                }
+            },
+            "dependencies": {
+                "nome": ["matriculaAluno_id"]
+            }
+        },
+        "professor": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "matriculaProfessor_id": {
+                    "type": "integer"
+                },
+                "nome": {
+                    "type": "string"
+                }
+            },
+            "dependencies": {
+                "nome": ["matriculaProfessor_id"]
+            }
+        },
+        "disciplina": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "codCred_id": {
+                    "type": "integer"
+                },
+                "nome": {
+                    "type": "string"
+                },
+                "conteudos": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/conteudo"
+                    }
+                }
+            },
+            "dependencies": {
+                "nome": ["codCred_id"],
+                "conteudos": ["codCred_id"]
+            }
+        },
+        "turma": {
+            "type": "object",
+            "additionalProperties": false,
+            "properties": {
+                "numTurma_id": {
+                    "type": "integer"
+                },
+                "semestre": {
+                    "type": "integer"
+                },
+                "horario": {
+                    "type": "integer"
+                },
+                "professor_id": {
+                    "$ref": "#/definitions/professor/properties/matriculaProfessor_id"
+                },
+                "disciplina_id": {
+                    "$ref": "#/definitions/disciplina/properties/codCred_id"
+                },
+                "alunos": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "properties": {
+                            "matriculaAluno_id" :{
+                                "$ref": "#/definitions/aluno/properties/matriculaAluno_id"
+                            },
+                            "avaliacao": {
+                                "$ref": "#/definitions/avaliacao"
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "type": "object",
+    "properties": {
+        "aluno": {
+            "$ref": "#/definitions/aluno"
+        },
+        "conteudo": {
+            "$ref": "#/definitions/conteudo"
+        },
+        "turma": {
+            "$ref": "#/definitions/turma"
+        },
+        "disciplina": {
+            "$ref": "#/definitions/disciplina"
+        },
+        "professor": {
+            "$ref": "#/definitions/professor"
+        },
+        "avaliacao": {
+            "$ref": "#/definitions/avaliacao"
+        }
+    },
+    "additionalProperties": false
+}

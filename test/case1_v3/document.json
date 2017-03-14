@@ -1,0 +1,45 @@
+{
+    "aluno": {
+        "matriculaAluno_id": 1,
+        "nome": "joão silva"
+    },
+    "avaliacao": {
+        "notaG1": 5,
+        "notaG2": 5,
+        "faltas": 3
+    },
+    "conteudo": {
+        "titulo": "Unidade 1",
+        "descricao": "Conteudos dos 3 primeiros capitulos"
+    },
+    "disciplina": {
+        "codCred_id": 123,
+        "nome": "Introdução",
+        "conteudos": [{
+            "titulo": "Unidade 1",
+            "descricao": "Conteudos dos 3 primeiros capitulos"
+        }, {
+            "titulo": "Unidade 2",
+            "descricao": "Conteudos dos 3 ultimos capitulos"
+        }]
+    },
+    "professor": {
+        "matriculaProfessor_id": 1,
+        "nome": "José Silva"
+    },
+	"turma": {
+        "numTurma_id": 128,
+        "semestre": 2,
+        "horario": 18,
+        "professor_id": 1,
+        "disciplina_id":123,
+        "alunos": [{
+            "matriculaAluno_id": 1,
+            "avaliacao":{
+                "notaG1": 5,
+                "notaG2": 5,
+                "faltas": 3
+            }
+        }]
+    }
+}

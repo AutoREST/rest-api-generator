@@ -1,0 +1,1 @@
+var #resource_name# = require('./routers/#resource_name#');
