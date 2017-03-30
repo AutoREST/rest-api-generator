@@ -1,0 +1,23 @@
+router.post('/{{resource_name}}/', function(req, res) {
+	if (req.body.{{id_field_name}}) {
+		var data = {
+			_id: req.body.{{id_field_name}}{{required_fields}}
+		};
+		{{not_required_fields}}
+		{{model_name}}.findByIdAndUpdate(
+			req.body.{{id_field_name}},
+			data, {
+				new: true,
+				upsert: true
+			},
+			function(err, doc) {
+				if (err)
+					res.status(400).send();
+				else
+					res.status(201).send(doc.cleanObject());
+			}
+		);
+	} else {
+		res.status(400).send();
+	}
+});

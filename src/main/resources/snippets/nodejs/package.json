@@ -1,0 +1,17 @@
+{
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "{{api_repo_url}}"
+  },
+  "dependencies": {
+    "body-parser": "1.71.1",
+    "cookie-parser": "1.4.3",
+    "express": "4.15.2",
+    "express-session": "1.15.1",
+    "method-override": "2.3.7",
+    "mongoose": "4.9.1",
+    "mongoose-integer": "0.1.1",
+    "morgan": "1.8.1"
+  }
+}

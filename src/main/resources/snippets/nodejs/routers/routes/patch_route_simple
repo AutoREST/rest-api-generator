@@ -1,0 +1,23 @@
+
+router.patch('/{{resource_name}}/:identifier', function(req, res) {
+	{{model_name}}.findById(req.params.identifier, function(err, data) {
+		if (err) {
+			res.status(400).send(err);
+		} else {
+			if (data) {
+				{{all_fields}}
+				data.save(function(err) {
+					if (err){
+						res.status(400).send();
+					}
+					else{
+						res.status(200).send(data.cleanObject());
+					}
+				});
+			}
+			else{
+				res.status(404).send();
+			}
+		}
+	});
+});

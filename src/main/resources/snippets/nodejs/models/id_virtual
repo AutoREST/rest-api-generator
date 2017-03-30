@@ -1,0 +1,6 @@
+{{model_name}}Schema.virtual('{{prop_name}}').get(function() {
+	return this._id;
+});
+{{model_name}}Schema.virtual('{{prop_name}}').set(function (value) {
+	this._id = value;
+});

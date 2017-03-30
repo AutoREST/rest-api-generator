@@ -1,2 +1,0 @@
-    if (req.query.hasOwnProperty("#prop_name#"))
-        query.#prop_name# = req.query.#prop_name#;

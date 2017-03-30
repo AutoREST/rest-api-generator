@@ -7,7 +7,7 @@ var methodOverride = require('method-override');
 
 var mongoose = require('mongoose');
 
-/*#routers_requires#*/
+{{routers_requires}}
 
 var app = express();
 
@@ -38,7 +38,7 @@ app.use(bodyParser.urlencoded({
 	extended: true
 }));
 app.use(methodOverride());
-/*#routes#*/
+{{routes}}
 app.get("/",function(req, res) {
 	res.send("Hello from AutoREST");
 });

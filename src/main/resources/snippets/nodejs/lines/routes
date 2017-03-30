@@ -1,1 +1,1 @@
-app.use("/api", #resource_name#);
+app.use("/api", {{resource_name}});

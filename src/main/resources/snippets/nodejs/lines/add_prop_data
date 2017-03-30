@@ -1,0 +1,2 @@
+if (req.body.hasOwnProperty("{{prop_name}}"))
+	data.{{prop_name}} = req.body.{{prop_name}};

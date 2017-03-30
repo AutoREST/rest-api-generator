@@ -1,0 +1,28 @@
+{
+	"definitions" : {
+		"student" : {
+			"type" : "object",
+			"properties" : {
+				"badge" : {
+					"type" : "integer"
+				},
+				"name" : {
+					"type" : "string"
+				},
+				"age" : {
+					"type" : "integer"
+				},
+				"finalGrade" : {
+					"type" : "number"
+				}
+			},
+			"required" : [ "badge", "name", "age"],
+			"dependencies" : {
+				"name" : ["badge"],
+				"age" : ["badge"],
+				"finalGrade" : ["badge"]
+			}
+		}
+	},
+	"type" : "object"
+}

@@ -1,6 +1,8 @@
 package autorest.generator;
 
 import java.io.*;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
 import java.util.zip.ZipEntry;
@@ -44,23 +46,24 @@ public class GeneratorTool {
 				this.loadSnippets();
 				StringBuilder routes = new StringBuilder();
 				StringBuilder routers_requires = new StringBuilder();
-				Map<String, String> models = new HashMap<>();
-				Map<String, String> routers = new HashMap<>();
+				Map<String, ModelBuilder> models = new HashMap<>();
+				Map<String, RouterBuilder> routers = new HashMap<>();
 				Map<String, JSchRestriction> definitions = pfsh.getDefinitions();
 				JSchRestriction mainJSchema = pfsh.getMainJSchema();
 
 				for (String resourceName : definitions.keySet()) {
 					JSchRestriction resource = definitions.get(resourceName);
+					ModelBuilder model = new ModelBuilder(capitalize(resourceName), resource, this.snippets);
+					models.put(resourceName, model);
+					routers.put(resourceName, new RouterBuilder(resourceName, model, resource, this.snippets));
 
-					routers.put(resourceName, generateRouter(resourceName, resource));
-
-					routes.append(this.snippets.get("routes").replace("#resource_name#", resourceName));
-					routers_requires.append(this.snippets.get("routers_requires").replace("#resource_name#", resourceName));
+					routes.append(this.snippets.get("routes").replace("{{resource_name}}", resourceName));
+					routers_requires.append(this.snippets.get("routers_requires").replace("{{resource_name}}", resourceName));
 				}
 
 				String apiJs = this.snippets.get("api.js");
-				apiJs = apiJs.replace("/*#routers_requires#*/", routers_requires.toString());
-				apiJs = apiJs.replace("/*#routes#*/", routes.toString());
+				apiJs = apiJs.replace("{{routers_requires}}", routers_requires.toString());
+				apiJs = apiJs.replace("{{routes}}", routes.toString());
 
 				String apiZipPath = "generatedAPI";
 				this.saveApi(apiZipPath, apiJs, models, routers);
@@ -74,45 +77,43 @@ public class GeneratorTool {
 		return IOUtils.toString(input, encoding);
 	}
 
-	private String generateRouter(String resourceName, JSchRestriction resource){
-		String model_name = capitalize(resourceName);
-		StringBuilder buildedQuery = new StringBuilder();
-		Map<String, JSchRestriction> props = resource.getProperties();
-		String resourceId = "id";
-		for (String propName : props.keySet()) {
-			if(!propName.equals(resourceId))
-				buildedQuery.append(this.snippets.get("query_from_body").replace("#prop_name#", propName));
-		}
-
-		String get_route = this.snippets.get("get_route");
-		get_route = get_route.replace("/*#resource_name#*/", resourceName);
-		get_route = get_route.replace("/*#query_building#*/", buildedQuery);
-		get_route = get_route.replace("/*#model_name#*/", model_name);
-		// System.out.println("get_route:\n"+get_route);
-		return get_route;
-	}
-
 	private static String capitalize(final String line) {
 	   return Character.toUpperCase(line.charAt(0)) + line.substring(1);
 	}
 
 	private void loadSnippets()  throws IOException{
 		this.snippets = new HashMap<>();
+		this.snippets.put("package.json", getResourseAsString("/snippets/nodejs/package.json"));
 		this.snippets.put("api.js", getResourseAsString("/snippets/nodejs/api.js"));
 		this.snippets.put("routers_requires", getResourseAsString("/snippets/nodejs/lines/routers_requires"));
 		this.snippets.put("routes", getResourseAsString("/snippets/nodejs/lines/routes"));
-		this.snippets.put("query_from_body", getResourseAsString("/snippets/nodejs/lines/query_from_body"));
-		this.snippets.put("get_route", getResourseAsString("/snippets/nodejs/routers/routes/get_route"));
 		this.snippets.put("router", getResourseAsString("/snippets/nodejs/routers/router.js"));
+		this.snippets.put("model", getResourseAsString("/snippets/nodejs/models/model.js"));
+		this.snippets.put("get_route_simple", getResourseAsString("/snippets/nodejs/routers/routes/get_route_simple"));
+		this.snippets.put("get_route_multi", getResourseAsString("/snippets/nodejs/routers/routes/get_route_multi"));
+		this.snippets.put("head_route_simple", getResourseAsString("/snippets/nodejs/routers/routes/head_route_simple"));
+		this.snippets.put("head_route_multi", getResourseAsString("/snippets/nodejs/routers/routes/head_route_multi"));
+		this.snippets.put("post_route_simple", getResourseAsString("/snippets/nodejs/routers/routes/post_route_simple"));
+		this.snippets.put("put_route_simple", getResourseAsString("/snippets/nodejs/routers/routes/put_route_simple"));
+		this.snippets.put("patch_route_simple", getResourseAsString("/snippets/nodejs/routers/routes/patch_route_simple"));
+		this.snippets.put("delete_route_simple", getResourseAsString("/snippets/nodejs/routers/routes/delete_route_simple"));
+		this.snippets.put("add_prop_query", getResourseAsString("/snippets/nodejs/lines/add_prop_query"));
+		this.snippets.put("add_prop_data", getResourseAsString("/snippets/nodejs/lines/add_prop_data"));
+		this.snippets.put("id_virtual", getResourseAsString("/snippets/nodejs/models/id_virtual"));
 	}
 
-	private void saveApi(String savePathName, String apiJs, Map<String, String> models, Map<String, String> routers) throws IOException{
+	private void saveApi(String savePathName, String apiJs, Map<String, ModelBuilder> models, Map<String, RouterBuilder> routers) throws IOException{
 		String zipFile = savePathName + ".zip";
 
 		FileOutputStream fos = new FileOutputStream(zipFile);
 		ZipOutputStream zos = new ZipOutputStream(fos);
 
-		ZipEntry entry = new ZipEntry("api.js");
+		ZipEntry entry = new ZipEntry("package.json");
+		zos.putNextEntry(entry);
+		zos.write(this.snippets.get("package.json").getBytes());
+		zos.closeEntry();
+
+		entry = new ZipEntry("api.js");
 		zos.putNextEntry(entry);
 		zos.write(apiJs.getBytes());
 		zos.closeEntry();
@@ -122,7 +123,7 @@ public class GeneratorTool {
 		for (String modelName : models.keySet()) {
 			ZipEntry modelEntry = new ZipEntry("models/"+modelName.toLowerCase()+".js");
 			zos.putNextEntry(modelEntry);
-			zos.write(models.get(modelName).getBytes());
+			zos.write(models.get(modelName).toString().getBytes());
 			zos.closeEntry();
 		}
 
@@ -131,7 +132,7 @@ public class GeneratorTool {
 		for (String routerName : routers.keySet()) {
 			ZipEntry routerEntry = new ZipEntry("routers/"+routerName.toLowerCase()+".js");
 			zos.putNextEntry(routerEntry);
-			zos.write(routers.get(routerName).getBytes());
+			zos.write(routers.get(routerName).toString().getBytes());
 			zos.closeEntry();
 		}
 		zos.close();

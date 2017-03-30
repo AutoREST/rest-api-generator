@@ -57,6 +57,11 @@ public class JSchRestriction implements Serializable{
 	public List<JSONType> getTypes(){
 		return this.types;
 	}
+	public JSONType getFirstType(){
+		if(this.types.size()>0)
+			return this.types.get(0);
+		return JSONType.OBJECT;
+	}
 	public void setTitle(String newTitle){ this.title = newTitle; }
 	public String getTitle(){ return this.title; }
 	public void setDescription(String newDescription){ this.description = newDescription; }

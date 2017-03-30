@@ -1,1 +1,1 @@
-var #resource_name# = require('./routers/#resource_name#');
+var {{resource_name}} = require('./routers/{{resource_name}}');
