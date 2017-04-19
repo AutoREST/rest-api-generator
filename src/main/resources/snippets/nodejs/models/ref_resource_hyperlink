@@ -1,0 +1,4 @@
+	var {{prop_name}} = [];
+	for (key of doc.{{prop_name}})
+		{{prop_name}}.push(baseUrl + "/{{ref_resource_name}}/" + key);
+	doc.{{prop_name}} = {{prop_name}};

@@ -1,0 +1,1 @@
+	doc.{{prop_name}} = baseUrl + "/{{resource_name}}/" + doc.{{id_field_name}} + "/{{prop_name}}";

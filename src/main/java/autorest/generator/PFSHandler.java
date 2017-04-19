@@ -140,6 +140,17 @@ public class PFSHandler {
 		return jsch;
 	}
 
+	public String referencedResource(String jpointer){
+		Stack<String> keys = splitInStack(jpointer, "/");
+		String resource = null;
+		while (!keys.empty() && resource == null) {
+			String key = keys.pop();
+			if(key.equals("definitions"))
+				resource = keys.pop();
+		}
+		return resource;
+	}
+
 	public JSchRestriction dereference(String jpointer) throws Exception{
 		return this.dereference(this.defs, this.mJSch, jpointer);
 	}

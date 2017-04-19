@@ -62,7 +62,6 @@ var {{model_name}}Schema = new Schema({
 });
 
 {{id_virtual}}
-
 {{model_name}}Schema.plugin(integerValidator);
 
 {{model_name}}Schema.methods.cleanObject = function() {
@@ -70,6 +69,13 @@ var {{model_name}}Schema = new Schema({
 	delete doc.__v;
 	delete doc._id;
 	delete doc.id;
+	return doc;
+};
+
+{{model_name}}Schema.methods.cleanLinked = function(baseUrl) {
+	var doc = this.cleanObject();
+{{referenced_resources}}
+{{props_hyperlinks}}
 	return doc;
 };
 

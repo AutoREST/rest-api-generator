@@ -14,13 +14,46 @@
 				},
 				"finalGrade" : {
 					"type" : "number"
+				},
+				"awards" : {
+					"type" : "array",
+					"items" : {
+						"type" : "string"
+					}
+				},
+				"schoolrooms" :{
+					"type" : "array",
+					"items" : {
+						"$ref" : "#/definitions/schoolroom/properties/code"
+					}
 				}
 			},
 			"required" : [ "badge", "name", "age"],
 			"dependencies" : {
 				"name" : ["badge"],
 				"age" : ["badge"],
-				"finalGrade" : ["badge"]
+				"finalGrade" : ["badge"],
+				"awards" : ["badge"],
+				"schoolrooms" : ["badge"]
+			}
+		},
+		"schoolroom" : {
+			"type" : "object",
+			"properties" : {
+				"code" : {
+					"type" : "string"
+				},
+				"name" : {
+					"type" : "string"
+				},
+				"level" : {
+					"type" : "integer"
+				}
+			},
+			"required" : [ "code", "name", "level"],
+			"dependencies" : {
+				"name" : ["code"],
+				"level" : ["code"]
 			}
 		}
 	},

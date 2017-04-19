@@ -36,4 +36,21 @@ public enum JSONType {
         //     return JSONType.ARRAY;
 		return JSONType.OBJECT;
 	}
+
+	public String toMongooseType(){
+		switch (this) {
+			case STRING:
+				return "String";
+			case INTEGER:
+			case NUMBER:
+				return "Number";
+			case BOOLEAN:
+				return "Boolean";
+			case NULL:
+			case ARRAY:
+			case OBJECT:
+			default:
+				return "Object";
+		}
+	}
 }

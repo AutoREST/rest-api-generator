@@ -6,6 +6,8 @@ var {{model_name}} = require('../models/{{resource_name}}');
 
 {{get_route}}
 
+{{get_route_props}}
+
 {{post_route}}
 
 {{put_route}}

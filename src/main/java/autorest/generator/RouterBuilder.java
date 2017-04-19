@@ -8,7 +8,7 @@ import java.util.HashMap;
 public class RouterBuilder {
 
 	private String resourceId = "";
-	private String router, head_route, get_route, post_route, put_route, patch_route, delete_route;
+	private String router, head_route, get_route, get_route_prop, post_route, put_route, patch_route, delete_route;
 	private Map<String, String> snippets;
 	private String queryBuilder;
 	private String allFieldsData;
@@ -16,6 +16,7 @@ public class RouterBuilder {
 	private String notRequiredFieldsData;
 
 	public RouterBuilder(String resourceName, ModelBuilder model, JSchRestriction resource, Map<String, String> snippets){
+		List<String> propertiesEndpoints = model.getPropertiesEndpoints();
 		this.snippets = snippets;
 		this.setSnippets(model);
 		this.buildPropsBasedReplacements(model, resource.getProperties());
@@ -30,8 +31,17 @@ public class RouterBuilder {
 
 		patch_route = patch_route.replace("{{all_fields}}", allFieldsData);
 
+		String propsString = "";
+		if(!propertiesEndpoints.isEmpty()){
+			propsString = "var fullUrl = req.protocol + '://' + req.get('host') + req._parsedOriginalUrl.pathname;\n";
+			for (String propName : propertiesEndpoints)
+				propsString += "\t\t\t\tfinalDoc." + propName + " = fullUrl+\"/" + propName + "\";\n";
+		}
+		get_route = get_route.replace("{{props_endpoints}}", propsString);
+
 		router = router.replace("{{head_route}}", head_route);
 		router = router.replace("{{get_route}}", get_route);
+		router = router.replace("{{get_route_props}}", buildPropertiesEndpoints(propertiesEndpoints));
 		router = router.replace("{{post_route}}", post_route);
 		router = router.replace("{{put_route}}", put_route);
 		router = router.replace("{{patch_route}}", patch_route);
@@ -49,6 +59,7 @@ public class RouterBuilder {
 				this.resourceId = model.getKey();
 			this.head_route = this.snippets.get("head_route_simple");
 			this.get_route = this.snippets.get("get_route_simple");
+			this.get_route_prop = this.snippets.get("get_route_simple_prop");
 			this.post_route = this.snippets.get("post_route_simple");
 			this.put_route = this.snippets.get("put_route_simple");
 			this.patch_route = this.snippets.get("patch_route_simple");
@@ -79,7 +90,7 @@ public class RouterBuilder {
 				queryBuilderSB.append(this.snippets.get("add_prop_query").replace("{{prop_name}}", propName));
 				allFieldsDataSB.append(this.snippets.get("add_prop_data").replace("{{prop_name}}", propName));
 				if(required.contains(propName))
-					requiredFieldsDataSB.append(",\n"+propName+": req.body."+propName);
+					requiredFieldsDataSB.append((",\n{{prop_name}}: req.body.{{prop_name}}").replace("{{prop_name}}", propName));
 				else
 					notRequiredFieldsDataSB.append(this.snippets.get("add_prop_data").replace("{{prop_name}}", propName));
 			}
@@ -89,6 +100,13 @@ public class RouterBuilder {
 		this.allFieldsData = allFieldsDataSB.toString();
 		this.requiredFieldsData = requiredFieldsDataSB.toString();
 		this.notRequiredFieldsData = notRequiredFieldsDataSB.toString();
+	}
+
+	public String buildPropertiesEndpoints(List<String> propertiesEndpoints){
+		StringBuilder props = new StringBuilder();
+		for (String propName : propertiesEndpoints)
+			props.append(this.get_route_prop.replace("{{prop_name}}", propName)+"\n");
+		return props.toString();
 	}
 
 	public String toString(){

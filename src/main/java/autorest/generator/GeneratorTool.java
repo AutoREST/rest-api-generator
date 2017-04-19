@@ -35,7 +35,7 @@ public class GeneratorTool {
 		}
 	}
 
-	public GeneratorTool(String fileName, Boolean verbose) throws IOException{
+	public GeneratorTool(String fileName, Boolean verbose) throws Exception{
 		JSchParser yyparser = new JSchParser(fileName);
 		yyparser.setVerbose(verbose);
 		Boolean parsed = yyparser.parse();
@@ -53,7 +53,7 @@ public class GeneratorTool {
 
 				for (String resourceName : definitions.keySet()) {
 					JSchRestriction resource = definitions.get(resourceName);
-					ModelBuilder model = new ModelBuilder(capitalize(resourceName), resource, this.snippets);
+					ModelBuilder model = new ModelBuilder(capitalize(resourceName), resource, pfsh, this.snippets);
 					models.put(resourceName, model);
 					routers.put(resourceName, new RouterBuilder(resourceName, model, resource, this.snippets));
 
@@ -90,6 +90,7 @@ public class GeneratorTool {
 		this.snippets.put("router", getResourseAsString("/snippets/nodejs/routers/router.js"));
 		this.snippets.put("model", getResourseAsString("/snippets/nodejs/models/model.js"));
 		this.snippets.put("get_route_simple", getResourseAsString("/snippets/nodejs/routers/routes/get_route_simple"));
+		this.snippets.put("get_route_simple_prop", getResourseAsString("/snippets/nodejs/routers/routes/get_route_simple_prop"));
 		this.snippets.put("get_route_multi", getResourseAsString("/snippets/nodejs/routers/routes/get_route_multi"));
 		this.snippets.put("head_route_simple", getResourseAsString("/snippets/nodejs/routers/routes/head_route_simple"));
 		this.snippets.put("head_route_multi", getResourseAsString("/snippets/nodejs/routers/routes/head_route_multi"));
@@ -100,6 +101,8 @@ public class GeneratorTool {
 		this.snippets.put("add_prop_query", getResourseAsString("/snippets/nodejs/lines/add_prop_query"));
 		this.snippets.put("add_prop_data", getResourseAsString("/snippets/nodejs/lines/add_prop_data"));
 		this.snippets.put("id_virtual", getResourseAsString("/snippets/nodejs/models/id_virtual"));
+		this.snippets.put("prop_hyperlink", getResourseAsString("/snippets/nodejs/models/prop_hyperlink"));
+		this.snippets.put("ref_resource_hyperlink", getResourseAsString("/snippets/nodejs/models/ref_resource_hyperlink"));
 	}
 
 	private void saveApi(String savePathName, String apiJs, Map<String, ModelBuilder> models, Map<String, RouterBuilder> routers) throws IOException{
