@@ -1,0 +1,2 @@
+		if(doc.{{prop_name}})
+			doc.{{prop_name}} = baseUrl + "/{{ref_resource_name}}/" + doc.{{prop_name}};

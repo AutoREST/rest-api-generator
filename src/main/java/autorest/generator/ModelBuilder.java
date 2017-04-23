@@ -15,14 +15,16 @@ public class ModelBuilder {
 	private String primaryKey;
 	private List<String> required;
 	private List<String> propertiesEndpoints;
-	private Map<String, String> referencedResources;
+	private Map<String, String> refResourcesSingle;
+	private Map<String, String> refResourcesInArray;
 
 	public ModelBuilder(String model_name, JSchRestriction resource, PFSHandler pfsh, Map<String, String> snippets) throws Exception{
 		this.pfsh = pfsh;
 		this.modelName = model_name;
 		this.primaryKeys = new ArrayList<>();
 		this.propertiesEndpoints = new ArrayList<>();
-		this.referencedResources = new HashMap<>();
+		this.refResourcesSingle = new HashMap<>();
+		this.refResourcesInArray = new HashMap<>();
 		this.required = resource.getRequired();
 		if(this.required == null)
 			this.required = new ArrayList<>();
@@ -39,6 +41,8 @@ public class ModelBuilder {
 			JSchRestriction prop = props.get(name);
 			if(prop.hasRefs() && prop.getRef() != null){
 				String ref = prop.getRef();
+				String refResource = this.pfsh.referencedResource(ref);
+				this.refResourcesSingle.put(fieldName, refResource);
 				prop = (JSchRestriction)DeepCopy.copy(this.pfsh.dereference(ref));
 			}
 			fields += buildField(prop, fieldName, isRequired) + ",\n";
@@ -54,11 +58,25 @@ public class ModelBuilder {
 				propsH += snippets.get("prop_hyperlink").replace("{{prop_name}}", propName);
 		}
 		String refRes = "";
-		if(!this.referencedResources.isEmpty()){
-			for (String propName : this.referencedResources.keySet()) {
-				String hyperlink = snippets.get("ref_resource_hyperlink");
+		String arraysItems = "";
+		String arraysLinks = "";
+		if(!this.refResourcesInArray.isEmpty()){
+			for (String propName : this.refResourcesInArray.keySet()) {
+				String hyperlinkItems = snippets.get("ref_resource_array_item");
+				hyperlinkItems = hyperlinkItems.replace("{{prop_name}}", propName);
+				hyperlinkItems = hyperlinkItems.replace("{{ref_resource_name}}", this.refResourcesInArray.get(propName));
+				arraysItems += hyperlinkItems;
+				String hyperlink = snippets.get("prop_hyperlink");
 				hyperlink = hyperlink.replace("{{prop_name}}", propName);
-				hyperlink = hyperlink.replace("{{ref_resource_name}}", this.referencedResources.get(propName));
+				propertiesEndpoints.add(propName);//will make the RouterBuilder create the endpoint method
+				arraysLinks += hyperlink;
+			}
+		}
+		if(!this.refResourcesSingle.isEmpty()){
+			for (String propName : this.refResourcesSingle.keySet()) {
+				String hyperlink = snippets.get("ref_resource_prop");
+				hyperlink = hyperlink.replace("{{prop_name}}", propName);
+				hyperlink = hyperlink.replace("{{ref_resource_name}}", this.refResourcesSingle.get(propName));
 				refRes += hyperlink;
 			}
 		}
@@ -66,7 +84,9 @@ public class ModelBuilder {
 		this.modelFile = this.modelFile.replace("{{fields}}", fields.substring(0, fields.length()-2));
 		this.modelFile = this.modelFile.replace("{{id_virtual}}", id_virtual);
 		this.modelFile = this.modelFile.replace("{{props_hyperlinks}}", propsH);
-		this.modelFile = this.modelFile.replace("{{referenced_resources}}", refRes);
+		this.modelFile = this.modelFile.replace("{{ref_resources_props}}", refRes);
+		this.modelFile = this.modelFile.replace("{{ref_resources_array_items}}", arraysItems);
+		this.modelFile = this.modelFile.replace("{{ref_resources_array_hyperlinks}}", arraysLinks);
 		this.modelFile = this.modelFile.replace("{{id_field_name}}", this.primaryKey);
 		this.modelFile = this.modelFile.replace("{{resource_name}}", this.modelName.toLowerCase());
 		this.modelFile = this.modelFile.replace("{{model_name}}", this.modelName);
@@ -84,7 +104,7 @@ public class ModelBuilder {
 						endpoint = false;
 						String ref = sameItems.getRef();
 						String refResource = this.pfsh.referencedResource(ref);
-						this.referencedResources.put(fieldName, refResource);
+						this.refResourcesInArray.put(fieldName, refResource);
 						sameItems = (JSchRestriction)DeepCopy.copy(this.pfsh.dereference(ref));
 					}
 					if(!sameItems.hasRefs()){

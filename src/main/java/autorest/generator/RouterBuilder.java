@@ -31,14 +31,6 @@ public class RouterBuilder {
 
 		patch_route = patch_route.replace("{{all_fields}}", allFieldsData);
 
-		String propsString = "";
-		if(!propertiesEndpoints.isEmpty()){
-			propsString = "var fullUrl = req.protocol + '://' + req.get('host') + req._parsedOriginalUrl.pathname;\n";
-			for (String propName : propertiesEndpoints)
-				propsString += "\t\t\t\tfinalDoc." + propName + " = fullUrl+\"/" + propName + "\";\n";
-		}
-		get_route = get_route.replace("{{props_endpoints}}", propsString);
-
 		router = router.replace("{{head_route}}", head_route);
 		router = router.replace("{{get_route}}", get_route);
 		router = router.replace("{{get_route_props}}", buildPropertiesEndpoints(propertiesEndpoints));

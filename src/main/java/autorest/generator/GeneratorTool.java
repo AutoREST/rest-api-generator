@@ -102,7 +102,8 @@ public class GeneratorTool {
 		this.snippets.put("add_prop_data", getResourseAsString("/snippets/nodejs/lines/add_prop_data"));
 		this.snippets.put("id_virtual", getResourseAsString("/snippets/nodejs/models/id_virtual"));
 		this.snippets.put("prop_hyperlink", getResourseAsString("/snippets/nodejs/models/prop_hyperlink"));
-		this.snippets.put("ref_resource_hyperlink", getResourseAsString("/snippets/nodejs/models/ref_resource_hyperlink"));
+		this.snippets.put("ref_resource_prop", getResourseAsString("/snippets/nodejs/models/ref_resource_prop"));
+		this.snippets.put("ref_resource_array_item", getResourseAsString("/snippets/nodejs/models/ref_resource_array_item"));
 	}
 
 	private void saveApi(String savePathName, String apiJs, Map<String, ModelBuilder> models, Map<String, RouterBuilder> routers) throws IOException{

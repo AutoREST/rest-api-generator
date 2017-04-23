@@ -64,18 +64,24 @@ var {{model_name}}Schema = new Schema({
 {{id_virtual}}
 {{model_name}}Schema.plugin(integerValidator);
 
-{{model_name}}Schema.methods.cleanObject = function() {
+{{model_name}}Schema.methods.cleanObject = function(baseUrl, depth) {
 	var doc = this.toObject({ virtuals: true });
+	var navLinks = (depth == 0);
+	var itemLinks = (depth == 1);
+
 	delete doc.__v;
 	delete doc._id;
 	delete doc.id;
-	return doc;
-};
 
-{{model_name}}Schema.methods.cleanLinked = function(baseUrl) {
-	var doc = this.cleanObject();
-{{referenced_resources}}
+	if(navLinks || itemLinks){
+{{ref_resources_props}}
 {{props_hyperlinks}}
+		if(itemLinks){
+{{ref_resources_array_items}}
+		}else {
+{{ref_resources_array_hyperlinks}}
+		}
+	}
 	return doc;
 };
 

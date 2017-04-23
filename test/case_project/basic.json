@@ -26,6 +26,9 @@
 					"items" : {
 						"$ref" : "#/definitions/schoolroom/properties/code"
 					}
+				},
+				"project" : {
+					"$ref" : "#/definitions/project/properties/code"
 				}
 			},
 			"required" : [ "badge", "name", "age"],
@@ -54,6 +57,32 @@
 			"dependencies" : {
 				"name" : ["code"],
 				"level" : ["code"]
+			}
+		},
+		"project" : {
+			"type" : "object",
+			"properties" : {
+				"code" : {
+					"type" : "string"
+				},
+				"title" : {
+					"type" : "string"
+				},
+				"description" : {
+					"type" : "string"
+				},
+				"tags" : {
+					"type" : "array",
+					"items" : {
+						"type" : "string"
+					}
+				}
+			},
+			"required" : [ "code", "title", "description"],
+			"dependencies" : {
+				"title" : ["code"],
+				"description" : ["code"],
+				"tags" : ["code"]
 			}
 		}
 	},

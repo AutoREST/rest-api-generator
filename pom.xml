@@ -2,7 +2,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>autorest.generator</groupId>
     <artifactId>rest-api-generator</artifactId>
-    <version>0.1b</version>
+    <version>0.1c</version>
     <packaging>jar</packaging>
     <name>REST API Generator</name>
     <url>https://github.com/AutoREST/rest-api-generator</url>
