@@ -151,6 +151,12 @@ public class PFSHandler {
 		return resource;
 	}
 
+	public JSchRestriction getResource(String resource){
+		if(resource != null && this.defs.keySet().contains(resource))
+			return this.defs.get(resource);
+		return null;
+	}
+
 	public JSchRestriction dereference(String jpointer) throws Exception{
 		return this.dereference(this.defs, this.mJSch, jpointer);
 	}

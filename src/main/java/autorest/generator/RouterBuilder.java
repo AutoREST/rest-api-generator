@@ -11,6 +11,8 @@ public class RouterBuilder {
 	private String router, head_route, get_route, get_route_prop, post_route, put_route, patch_route, delete_route;
 	private Map<String, String> snippets;
 	private String queryBuilder;
+	private String reqValBody;
+	private String reqValQuery;
 	private String allFieldsData;
 	private String requiredFieldsData;
 	private String notRequiredFieldsData;
@@ -21,15 +23,22 @@ public class RouterBuilder {
 		this.setSnippets(model);
 		this.buildPropsBasedReplacements(model, resource.getProperties());
 
+		post_route = post_route.replace("{{request_validation}}", reqValBody);
 		post_route = post_route.replace("{{id_field_name}}", resourceId);
 		post_route = post_route.replace("{{required_fields}}", requiredFieldsData);
 		post_route = post_route.replace("{{not_required_fields}}", notRequiredFieldsData);
 
+		put_route = put_route.replace("{{request_validation}}", reqValQuery);
 		put_route = put_route.replace("{{id_field_name}}", resourceId);
 		put_route = put_route.replace("{{required_fields}}", requiredFieldsData);
 		put_route = put_route.replace("{{not_required_fields}}", notRequiredFieldsData);
 
+		patch_route = patch_route.replace("{{request_validation}}", reqValQuery);
 		patch_route = patch_route.replace("{{all_fields}}", allFieldsData);
+
+		delete_route = delete_route.replace("{{request_validation}}", reqValQuery);
+
+		head_route = head_route.replace("{{request_validation}}", reqValQuery);
 
 		router = router.replace("{{head_route}}", head_route);
 		router = router.replace("{{get_route}}", get_route);
@@ -71,6 +80,8 @@ public class RouterBuilder {
 
 	private void buildPropsBasedReplacements(ModelBuilder model, Map<String, JSchRestriction> props){
 		StringBuilder queryBuilderSB = new StringBuilder();
+		StringBuilder reqValBodySB = new StringBuilder();
+		StringBuilder reqValQuerySB = new StringBuilder();
 		StringBuilder allFieldsDataSB = new StringBuilder();
 		StringBuilder requiredFieldsDataSB = new StringBuilder();
 		StringBuilder notRequiredFieldsDataSB = new StringBuilder();
@@ -88,9 +99,18 @@ public class RouterBuilder {
 			}
 		}
 
+		for (String key : model.getKeys()) {
+			reqValBodySB.append(this.snippets.get("req_val_body").replace("{{prop_name}}", key));
+			reqValQuerySB.append(this.snippets.get("req_val_query").replace("{{prop_name}}", key));
+		}
+
 		this.queryBuilder = queryBuilderSB.toString();
+		this.reqValBody = reqValBodySB.toString();
+		this.reqValQuery = reqValQuerySB.toString();
 		this.allFieldsData = allFieldsDataSB.toString();
 		this.requiredFieldsData = requiredFieldsDataSB.toString();
+		if(!model.isSimplekey())
+			this.requiredFieldsData = this.requiredFieldsData.substring(2);//no _id, then no need of the leading ",\n"
 		this.notRequiredFieldsData = notRequiredFieldsDataSB.toString();
 	}
 

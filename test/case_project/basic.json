@@ -84,6 +84,28 @@
 				"description" : ["code"],
 				"tags" : ["code"]
 			}
+		},
+		"grades" : {
+			"type" : "object",
+			"properties" : {
+				"student" : {
+					"$ref" : "#/definitions/student/properties/badge"
+				},
+				"schoolroom" : {
+					"$ref" : "#/definitions/schoolroom/properties/code"
+				},
+				"weight" : {
+					"type" : "number"
+				},
+				"title" :  {
+					"type" : "string"
+				}
+			},
+			"required" : ["student", "schoolroom", "weight", "title"],
+			"dependencies" : {
+				"weight" : ["student", "schoolroom"],
+				"title" : ["student", "schoolroom"]
+			}
 		}
 	},
 	"type" : "object"

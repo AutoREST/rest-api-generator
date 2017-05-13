@@ -4,7 +4,6 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
-import autorest.util.DeepCopy;
 
 public class ModelBuilder {
 	private PFSHandler pfsh;
@@ -29,31 +28,14 @@ public class ModelBuilder {
 		if(this.required == null)
 			this.required = new ArrayList<>();
 		this.setPrimaryKeys(resource.getDependencies());
-		String fields = "";
-		Map<String, JSchRestriction> props = resource.getProperties();
-		for (String name : props.keySet()) {
-			String fieldName;
-			Boolean isRequired = this.required.contains(name);
-			if(simpleKey && name.equals(this.primaryKey))
-				fieldName = "_id";
-			else
-				fieldName = name;
-			JSchRestriction prop = props.get(name);
-			if(prop.hasRefs() && prop.getRef() != null){
-				String ref = prop.getRef();
-				String refResource = this.pfsh.referencedResource(ref);
-				this.refResourcesSingle.put(fieldName, refResource);
-				prop = (JSchRestriction)DeepCopy.copy(this.pfsh.dereference(ref));
-			}
-			fields += buildField(prop, fieldName, isRequired) + ",\n";
-		}
+		String fields = buildFields(resource.getProperties());
 
 		String id_virtual = "";
 		if(this.simpleKey){
 			id_virtual = snippets.get("id_virtual");
 		}
 		String propsH = "";
-		if(!this.propertiesEndpoints.isEmpty()){
+		if(!this.propertiesEndpoints.isEmpty() && this.simpleKey){
 			for (String propName : propertiesEndpoints)
 				propsH += snippets.get("prop_hyperlink").replace("{{prop_name}}", propName);
 		}
@@ -66,10 +48,12 @@ public class ModelBuilder {
 				hyperlinkItems = hyperlinkItems.replace("{{prop_name}}", propName);
 				hyperlinkItems = hyperlinkItems.replace("{{ref_resource_name}}", this.refResourcesInArray.get(propName));
 				arraysItems += hyperlinkItems;
-				String hyperlink = snippets.get("prop_hyperlink");
-				hyperlink = hyperlink.replace("{{prop_name}}", propName);
-				propertiesEndpoints.add(propName);//will make the RouterBuilder create the endpoint method
-				arraysLinks += hyperlink;
+				if (this.simpleKey) {
+					String hyperlink = snippets.get("prop_hyperlink");
+					hyperlink = hyperlink.replace("{{prop_name}}", propName);
+					propertiesEndpoints.add(propName);//will make the RouterBuilder create the endpoint method
+					arraysLinks += hyperlink;
+				}
 			}
 		}
 		if(!this.refResourcesSingle.isEmpty()){
@@ -81,7 +65,7 @@ public class ModelBuilder {
 			}
 		}
 		this.modelFile = snippets.get("model");
-		this.modelFile = this.modelFile.replace("{{fields}}", fields.substring(0, fields.length()-2));
+		this.modelFile = this.modelFile.replace("{{fields}}", fields);
 		this.modelFile = this.modelFile.replace("{{id_virtual}}", id_virtual);
 		this.modelFile = this.modelFile.replace("{{props_hyperlinks}}", propsH);
 		this.modelFile = this.modelFile.replace("{{ref_resources_props}}", refRes);
@@ -90,6 +74,31 @@ public class ModelBuilder {
 		this.modelFile = this.modelFile.replace("{{id_field_name}}", this.primaryKey);
 		this.modelFile = this.modelFile.replace("{{resource_name}}", this.modelName.toLowerCase());
 		this.modelFile = this.modelFile.replace("{{model_name}}", this.modelName);
+	}
+
+	public String buildFields(Map<String, JSchRestriction> props) throws Exception{
+		String fields = "";
+		for (String name : props.keySet()) {
+			String fieldName;
+			Boolean isRequired = this.required.contains(name);
+			if(this.simpleKey && name.equals(this.primaryKey))
+				fieldName = "_id";
+			else
+				fieldName = name;
+			JSchRestriction prop = props.get(name);
+			if(prop.hasRefs() && prop.getRef() != null){
+				String ref = prop.getRef();
+				String refResource = this.pfsh.referencedResource(ref);
+				JSchRestriction resource = this.pfsh.getResource(refResource);
+				if(resource != null && resource.isSimplekey())
+					this.refResourcesSingle.put(fieldName, refResource);
+				prop = this.pfsh.dereference(ref).clone();
+			}
+			fields += buildField(prop, fieldName, isRequired) + ",\n";
+		}
+		if(fields.length()>0)
+			fields = fields.substring(0, fields.length()-2);
+		return fields;
 	}
 
 	public String buildField(JSchRestriction prop, String fieldName, Boolean isRequired) throws Exception{
@@ -105,7 +114,7 @@ public class ModelBuilder {
 						String ref = sameItems.getRef();
 						String refResource = this.pfsh.referencedResource(ref);
 						this.refResourcesInArray.put(fieldName, refResource);
-						sameItems = (JSchRestriction)DeepCopy.copy(this.pfsh.dereference(ref));
+						sameItems = this.pfsh.dereference(ref).clone();
 					}
 					if(!sameItems.hasRefs()){
 						field += "type: ["+sameItems.getFirstType().toMongooseType()+"]";

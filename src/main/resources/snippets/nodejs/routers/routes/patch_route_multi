@@ -1,0 +1,40 @@
+router.patch('/{{resource_name}}', function(req, res) {
+	var query = {};//Will be build on request validation
+	var valid = true;
+{{request_validation}}
+	if (valid) {
+		{{model_name}}.find(query, function(err, docs) {
+			if (err) {
+				res.status(400).send(err);
+			} else {
+				if (docs) {
+					var errInDocs = false;
+					var fullUrl = req.protocol + '://' + req.get('host') + req.baseUrl;
+					var depth = req.get('Depth');
+					var jsons = [];
+					for (var data of docs) {
+						{{all_fields}}
+						data.save(function(err) {
+							if (err){
+								errInDocs = true;
+								res.status(400).send();
+							}
+							else{
+								jsons.push(data.cleanObject(fullUrl, depth));
+							}
+						});
+					}
+					console.log('end for each of docs');
+					if(!errInDocs)
+						res.status(200).json(jsons);
+				}
+				else{
+					res.status(404).send();
+				}
+			}
+		});
+	}
+	else{
+		res.status(400).send();
+	}
+});

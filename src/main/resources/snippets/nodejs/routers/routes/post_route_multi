@@ -1,0 +1,26 @@
+router.post('/{{resource_name}}/', function(req, res) {
+	var query = {};//Will be build on request validation
+	var valid = true;
+{{request_validation}}
+	if (valid) {
+		var data = {
+			{{required_fields}}
+		};
+		{{not_required_fields}}
+		{{model_name}}.update(
+			query,
+			data, {
+				new: true,
+				upsert: true
+			},
+			function(err) {
+				if (err)
+					res.status(400).send();
+				else
+					res.status(201).send();
+			}
+		);
+	} else {
+		res.status(400).send();
+	}
+});

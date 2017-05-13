@@ -1,0 +1,16 @@
+router.delete('/{{resource_name}}', function(req, res) {
+	var query = {};//Will be build on request validation
+	var valid = true;
+{{request_validation}}
+	if (valid) {
+		{{model_name}}.deleteMany(query, function(err) {
+			if (err)
+				res.status(400).send();
+			else
+				res.status(204).send();
+		});
+	}
+	else{
+		res.status(400).send();
+	}
+});

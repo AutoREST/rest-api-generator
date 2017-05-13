@@ -1,7 +1,6 @@
 router.get('/{{resource_name}}/', function(req, res) {
 	var query = {};
 {{query_building}}
-{{identifier_check}}
 	{{model_name}}.find(query, function(err, docs) {
 		if (err) {
 			res.status(400).send();

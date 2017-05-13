@@ -1,0 +1,4 @@
+	if (req.body.hasOwnProperty("{{prop_name}}"))
+		query.{{prop_name}} = req.body.{{prop_name}};
+	else
+		valid = false;

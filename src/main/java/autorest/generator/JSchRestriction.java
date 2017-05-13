@@ -137,6 +137,22 @@ public class JSchRestriction implements Serializable{
 	public void setRef(String value) { this.ref = value; }
 	public String getRef() { return this.ref; }
 
+	public Boolean isSimplekey(){
+		List<String> primaryKeys = new ArrayList<>();
+		if(this.dependencies != null){
+			for (String p : this.dependencies.keySet()) {
+				List<String> kwords = this.dependencies.get(p).getKwords();
+				if(kwords != null){
+					for (String r : kwords) {
+						if(!primaryKeys.contains(r))
+							primaryKeys.add(r);
+					}
+				}
+			}
+		}
+		return (primaryKeys.size() == 1);
+	}
+
 	public Boolean hasRefs(){
 		if(this.ref != null)
 			return true;
