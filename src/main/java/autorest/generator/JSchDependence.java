@@ -2,6 +2,8 @@ package autorest.generator;
 import java.util.List;
 
 import java.util.ArrayList;
+import java.util.stream.Stream;
+import java.util.stream.Collectors;
 import java.io.Serializable;
 
 public class JSchDependence implements Serializable{
@@ -21,6 +23,14 @@ public class JSchDependence implements Serializable{
 		if(this.jsch != null && this.jsch.hasRefs())
 			return true;
 		return false;
+	}
+
+	public void mergeKwords(JSchDependence otherDependence){
+		List<String> otherKwords = otherDependence.getKwords();
+		if(otherKwords != null)
+			this.kwords = Stream.concat(this.kwords.stream(),
+										otherKwords.stream())
+										.collect(Collectors.toList());
 	}
 
 	public String toString(){

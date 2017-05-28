@@ -5,9 +5,12 @@ import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import org.apache.commons.io.IOUtils;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class GeneratorTool {
 	private static String encoding = "UTF-8";
@@ -18,12 +21,11 @@ public class GeneratorTool {
 			if ( args.length > 0 ) {
 				String fileName = args[0];
 				Boolean verbose = false;
+				String optionsJSON = "{}";
 				if(args.length > 1)
-					for(int i=1; i < args.length; i++)
-						if(args[i].equals("-v"))
-							verbose = true;
+					optionsJSON = args[1];
 
-				GeneratorTool generator = new GeneratorTool(fileName, verbose);
+				GeneratorTool generator = new GeneratorTool(fileName, optionsJSON);
 			}
 			else {
 				System.out.println("\n\tRequired input file path\n");
@@ -35,9 +37,15 @@ public class GeneratorTool {
 		}
 	}
 
-	public GeneratorTool(String fileName, Boolean verbose) throws Exception{
-		JSchParser yyparser = new JSchParser(fileName);
-		yyparser.setVerbose(verbose);
+	public GeneratorTool(String fileName, String optionsJSON) throws Exception{
+		this(new FileReader(fileName), optionsJSON);
+	}
+
+	public GeneratorTool(FileReader file, String optionsJSON) throws Exception{
+		ObjectMapper mapper = new ObjectMapper(); // create once, reuse
+		Options options = mapper.readValue(optionsJSON, Options.class);
+		JSchParser yyparser = new JSchParser(file);
+		yyparser.setVerbose(options.Verbose);
 		Boolean parsed = yyparser.parse();
 
 		if (parsed) {
@@ -51,11 +59,12 @@ public class GeneratorTool {
 				Map<String, JSchRestriction> definitions = pfsh.getDefinitions();
 				JSchRestriction mainJSchema = pfsh.getMainJSchema();
 
-				for (String resourceName : definitions.keySet()) {
-					JSchRestriction resource = definitions.get(resourceName);
-					ModelBuilder model = new ModelBuilder(capitalize(resourceName), resource, pfsh, this.snippets);
+				Map<String, Resource> resources = pfsh.getResources();
+				for (String resourceName : resources.keySet()) {
+					Resource res = resources.get(resourceName);
+					ModelBuilder model = new ModelBuilder(res, this.snippets);
 					models.put(resourceName, model);
-					routers.put(resourceName, new RouterBuilder(resourceName, model, resource, this.snippets));
+					routers.put(resourceName, new RouterBuilder(res, this.snippets));
 
 					routes.append(this.snippets.get("routes").replace("{{resource_name}}", resourceName));
 					routers_requires.append(this.snippets.get("routers_requires").replace("{{resource_name}}", resourceName));
@@ -64,10 +73,13 @@ public class GeneratorTool {
 				String apiJs = this.snippets.get("api.js");
 				apiJs = apiJs.replace("{{routers_requires}}", routers_requires.toString());
 				apiJs = apiJs.replace("{{routes}}", routes.toString());
+				apiJs = apiJs.replace("{{api_database}}", options.DataBaseName);
 
-				String apiZipPath = "generatedAPI";
-				this.saveApi(apiZipPath, apiJs, models, routers);
-				System.out.println("API saved in: " + apiZipPath);
+				String packageJson = this.snippets.get("package.json");
+				packageJson = packageJson.replace("{{api_repo_url}}", options.APIRepoURL);
+
+				String savedAPI = this.saveApi(options.APIName, packageJson, apiJs, models, routers);
+				System.out.println("API saved in: " + savedAPI);
 			}
 		}
 	}
@@ -112,15 +124,18 @@ public class GeneratorTool {
 		this.snippets.put("ref_resource_array_item", getResourseAsString("/snippets/nodejs/models/ref_resource_array_item"));
 	}
 
-	private void saveApi(String savePathName, String apiJs, Map<String, ModelBuilder> models, Map<String, RouterBuilder> routers) throws IOException{
-		String zipFile = savePathName + ".zip";
+	private String saveApi(String apiName, String packageJson,String apiJs, Map<String, ModelBuilder> models, Map<String, RouterBuilder> routers) throws IOException{
+		Path currentRelativePath = Paths.get("");
+		String absotultePath = currentRelativePath.toAbsolutePath().toString();
+		String zipFile = Paths.get(absotultePath, apiName + ".zip").toAbsolutePath().toString();
+		System.out.println("zipFile: " + zipFile);
 
 		FileOutputStream fos = new FileOutputStream(zipFile);
 		ZipOutputStream zos = new ZipOutputStream(fos);
 
 		ZipEntry entry = new ZipEntry("package.json");
 		zos.putNextEntry(entry);
-		zos.write(this.snippets.get("package.json").getBytes());
+		zos.write(packageJson.getBytes());
 		zos.closeEntry();
 
 		entry = new ZipEntry("api.js");
@@ -146,5 +161,7 @@ public class GeneratorTool {
 			zos.closeEntry();
 		}
 		zos.close();
+
+		return zipFile;
 	}
 }

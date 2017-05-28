@@ -7,6 +7,7 @@ import java.util.HashMap;
 
 public class RouterBuilder {
 
+	private Resource resource;
 	private String resourceId = "";
 	private String router, head_route, get_route, get_route_prop, post_route, put_route, patch_route, delete_route;
 	private Map<String, String> snippets;
@@ -17,11 +18,11 @@ public class RouterBuilder {
 	private String requiredFieldsData;
 	private String notRequiredFieldsData;
 
-	public RouterBuilder(String resourceName, ModelBuilder model, JSchRestriction resource, Map<String, String> snippets){
-		List<String> propertiesEndpoints = model.getPropertiesEndpoints();
+	public RouterBuilder(Resource res, Map<String, String> snippets) throws Exception{
+		this.resource = res;
 		this.snippets = snippets;
-		this.setSnippets(model);
-		this.buildPropsBasedReplacements(model, resource.getProperties());
+		this.setSnippets();
+		this.buildPropsBasedReplacements();
 
 		post_route = post_route.replace("{{request_validation}}", reqValBody);
 		post_route = post_route.replace("{{id_field_name}}", resourceId);
@@ -42,7 +43,7 @@ public class RouterBuilder {
 
 		router = router.replace("{{head_route}}", head_route);
 		router = router.replace("{{get_route}}", get_route);
-		router = router.replace("{{get_route_props}}", buildPropertiesEndpoints(propertiesEndpoints));
+		router = router.replace("{{get_route_props}}", buildPropertiesEndpoints());
 		router = router.replace("{{post_route}}", post_route);
 		router = router.replace("{{put_route}}", put_route);
 		router = router.replace("{{patch_route}}", patch_route);
@@ -50,14 +51,18 @@ public class RouterBuilder {
 
 		router = router.replace("{{query_building}}", queryBuilder);
 		router = router.replace("{{identifier_check}}", "");
-		router = router.replace("{{resource_name}}", resourceName);
-		router = router.replace("{{model_name}}", model.getModelName());
+		if(this.resource.hasParent())
+			router = router.replace("{{query_by_type}}", "query.type='"+this.resource.getName()+"';");
+		else
+			router = router.replace("{{query_by_type}}", "");
+		router = router.replace("{{resource_name}}", this.resource.getName());
+		router = router.replace("{{model_name}}", this.resource.getModelName());
 	}
 
-	public void setSnippets(ModelBuilder model){
-		if(model.isSimplekey()){
-			if(model.getKey() != null)
-				this.resourceId = model.getKey();
+	public void setSnippets(){
+		if(this.resource.isSimpleKey()){
+			if(this.resource.getPrimaryKey() != null)
+				this.resourceId = this.resource.getPrimaryKey();
 			this.head_route = this.snippets.get("head_route_simple");
 			this.get_route = this.snippets.get("get_route_simple");
 			this.get_route_prop = this.snippets.get("get_route_simple_prop");
@@ -78,7 +83,8 @@ public class RouterBuilder {
 		router = this.snippets.get("router");
 	}
 
-	private void buildPropsBasedReplacements(ModelBuilder model, Map<String, JSchRestriction> props){
+	private void buildPropsBasedReplacements(){
+		Map<String, JSchRestriction> props = this.resource.getProperties();
 		StringBuilder queryBuilderSB = new StringBuilder();
 		StringBuilder reqValBodySB = new StringBuilder();
 		StringBuilder reqValQuerySB = new StringBuilder();
@@ -86,7 +92,7 @@ public class RouterBuilder {
 		StringBuilder requiredFieldsDataSB = new StringBuilder();
 		StringBuilder notRequiredFieldsDataSB = new StringBuilder();
 
-		List<String> required = model.getRequired();
+		List<String> required = this.resource.getRequired();
 
 		for (String propName : props.keySet()) {
 			if(!propName.equals(resourceId)){
@@ -99,7 +105,7 @@ public class RouterBuilder {
 			}
 		}
 
-		for (String key : model.getKeys()) {
+		for (String key : this.resource.getPrimaryKeys()) {
 			reqValBodySB.append(this.snippets.get("req_val_body").replace("{{prop_name}}", key));
 			reqValQuerySB.append(this.snippets.get("req_val_query").replace("{{prop_name}}", key));
 		}
@@ -109,14 +115,14 @@ public class RouterBuilder {
 		this.reqValQuery = reqValQuerySB.toString();
 		this.allFieldsData = allFieldsDataSB.toString();
 		this.requiredFieldsData = requiredFieldsDataSB.toString();
-		if(!model.isSimplekey())
+		if(!this.resource.isSimpleKey())
 			this.requiredFieldsData = this.requiredFieldsData.substring(2);//no _id, then no need of the leading ",\n"
 		this.notRequiredFieldsData = notRequiredFieldsDataSB.toString();
 	}
 
-	public String buildPropertiesEndpoints(List<String> propertiesEndpoints){
+	public String buildPropertiesEndpoints() throws Exception{
 		StringBuilder props = new StringBuilder();
-		for (String propName : propertiesEndpoints)
+		for (String propName : this.resource.getPropertiesEndpoints())
 			props.append(this.get_route_prop.replace("{{prop_name}}", propName)+"\n");
 		return props.toString();
 	}

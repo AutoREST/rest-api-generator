@@ -1,0 +1,36 @@
+{
+	"definitions" : {
+		"person" : {
+			"type" : "object",
+			"properties" : {
+				"identity" : {
+					"type" : "integer"
+				},
+				"first_name" : {
+					"type" : "string"
+				},
+				"last_name" : {
+					"type" : "string"
+				}
+			},
+			"required" : ["identity", "first_name", "last_name"],
+			"dependencies" : {
+				"first_name" : ["identity"],
+				"last_name" : ["identity"]
+			}
+		},
+		"student" : {
+			"type" : "object",
+			"properties" : {
+				"person" : { "$ref" : "#/definitions/person"}
+			}
+		},
+		"professor" : {
+			"type" : "object",
+			"properties" : {
+				"person" : { "$ref" : "#/definitions/person"}
+			}
+		}
+	},
+	"type" : "object"
+}

@@ -9,11 +9,13 @@ import autorest.util.DeepCopy;
 public class PFSHandler {
 	private Map<String, JSchRestriction> defs;
 	private JSchRestriction mJSch;
+	private Map<String, Resource> resources;
 
 	private Boolean resolvableRefs;
 	private String resolveMessage;
 
 	public PFSHandler(Map<String, JSchRestriction> definitions, JSchRestriction mainJSchema) throws Exception{
+		this.resources = new HashMap<>();
 		if(definitions != null)
 			this.defs = definitions;
 		else
@@ -24,6 +26,8 @@ public class PFSHandler {
 			this.mJSch = new JSchRestriction();
 		this.resolvableRefs = false;
 		this.resolveMessage = "Didn't tried to resolve.";
+		this.loadResources();
+		this.resolveResourcesReferences();
 	}
 
 	public Map<String, JSchRestriction> getDefinitions(){
@@ -36,6 +40,48 @@ public class PFSHandler {
 
 	public String getResolveMessage(){
 		return this.resolveMessage;
+	}
+
+	public Map<String, Resource> getResources(){
+		return this.resources;
+	}
+
+	private void loadResources(){
+		for (String name : this.defs.keySet()) {
+			try {
+				Resource res = new Resource(name, this.defs.get(name).clone(), this);
+				this.resources.put(name, res);
+			}
+			catch (Exception e) {
+				System.out.println("Exception while loading "+name+"\n"+e.getMessage());
+				e.printStackTrace();
+			}
+		}
+	}
+
+	private void resolveResourcesReferences() throws Exception{
+		for (String name : this.resources.keySet()) {
+			Resource res = this.resources.get(name);
+			if(res.hasParent()){
+				// get all parent properties and add them to the child
+				Resource parent = this.resources.get(res.getParentName());
+				res.addParentProperties(parent);
+			}
+			// replace all properties, that are references, by the corresponding JSch
+			Map<String, Reference> references = res.getReferences();
+			for (String propName : references.keySet()) {
+				Reference ref = references.get(propName);
+				if(ref.getPropertyName() != null && ref.getResourceName() != null){
+					Resource refResource = this.resources.get(ref.getResourceName());
+					JSchRestriction newPropJSch = refResource.getProperties().get(ref.getPropertyName());
+					res.replaceProperty(propName, newPropJSch);
+					refResource.addRefferer(new Reference(res, propName));
+				}
+			}
+			// ensure all references have been addressed
+			if(res.hasPendingRefs())
+				throw new Exception("The resource "+name+" has unresolved/invalid references.");
+		}
 	}
 
 	public Boolean canResolveRefs(){
@@ -53,7 +99,7 @@ public class PFSHandler {
 
 	public static Boolean canResolveRefs(Map<String, JSchRestriction> definitions, JSchRestriction mainJSchema) throws Exception{
 		Map<String, JSchRestriction> cpDefinitions = (Map<String, JSchRestriction>)DeepCopy.copy(definitions);
-		JSchRestriction cpMainJSchema = (JSchRestriction)DeepCopy.copy(mainJSchema);
+		JSchRestriction cpMainJSchema = mainJSchema.clone();
 		PFSHandler pfsHandler = new PFSHandler(cpDefinitions, cpMainJSchema);
 		return pfsHandler.resolveReferences();
 	}
@@ -151,7 +197,7 @@ public class PFSHandler {
 		return resource;
 	}
 
-	public JSchRestriction getResource(String resource){
+	public JSchRestriction getDefinition(String resource){
 		if(resource != null && this.defs.keySet().contains(resource))
 			return this.defs.get(resource);
 		return null;
