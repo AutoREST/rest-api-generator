@@ -3,8 +3,12 @@ router.put('/{{resource_name}}/:identifier', function(req, res) {
 		{{id_field_name}}: req.params.identifier{{required_fields}}
 	};
 	{{not_required_fields}}
-	{{model_name}}.findByIdAndUpdate(
-		req.params.identifier,
+	var query = {
+		_id: req.params.identifier
+	};
+	{{query_by_type}}
+	{{model_name}}.findOneAndUpdate(
+		query,
 		data, {
 			new: true,
 			upsert: true

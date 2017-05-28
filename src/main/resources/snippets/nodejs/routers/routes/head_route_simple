@@ -1,5 +1,9 @@
 router.head('/{{resource_name}}/:identifier', function(req, res) {
-	{{model_name}}.findById(req.params.identifier, function(err, doc) {
+	var query = {
+		_id: req.params.identifier
+	};
+	{{query_by_type}}
+	{{model_name}}.find(query, function(err, doc) {
 		if (err){
 			res.status(400).send();
 		}

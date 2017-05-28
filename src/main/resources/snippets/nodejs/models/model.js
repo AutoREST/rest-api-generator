@@ -4,6 +4,7 @@ var mongoose = require('mongoose'),
 
 var {{model_name}}Schema = new Schema({
 	{{fields}}
+	{{type_field}}
     // _id: {
     //     type: Number,
     //     integer: true,
@@ -72,6 +73,7 @@ var {{model_name}}Schema = new Schema({
 	delete doc.__v;
 	delete doc._id;
 	delete doc.id;
+	{{delete_type}}
 
 	if(navLinks || itemLinks){
 {{ref_resources_props}}
@@ -85,4 +87,4 @@ var {{model_name}}Schema = new Schema({
 	return doc;
 };
 
-module.exports = mongoose.model('{{model_name}}', {{model_name}}Schema);
+module.exports = mongoose.model('{{model_name}}', {{model_name}}Schema, '{{collection_name}}');

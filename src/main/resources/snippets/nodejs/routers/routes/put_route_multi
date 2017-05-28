@@ -3,6 +3,7 @@ router.put('/{{resource_name}}', function(req, res) {
 	var valid = true;
 {{request_validation}}
 	if (valid) {
+		{{query_by_type}}
 		var data = {
 			{{required_fields}}
 		};

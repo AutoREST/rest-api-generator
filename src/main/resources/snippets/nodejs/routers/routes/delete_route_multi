@@ -3,6 +3,7 @@ router.delete('/{{resource_name}}', function(req, res) {
 	var valid = true;
 {{request_validation}}
 	if (valid) {
+		{{query_by_type}}
 		{{model_name}}.deleteMany(query, function(err) {
 			if (err)
 				res.status(400).send();

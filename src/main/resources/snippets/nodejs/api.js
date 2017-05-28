@@ -14,7 +14,7 @@ var app = express();
 var server_port = process.env.PORT || 5000;
 app.set('port', server_port);
 
-var connection_string = process.env.DATABASE || 'mongodb://localhost/mongooseTests';
+var connection_string = process.env.DATABASE || 'mongodb://localhost/{{api_database}}';
 
 mongoose.Promise = global.Promise;
 mongoose.connect(connection_string);
