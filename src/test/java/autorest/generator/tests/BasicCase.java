@@ -33,6 +33,7 @@ public class BasicCase extends TestCase {
         String sample = "{\"type\" : \"string\"}";
         StringReader reader = new StringReader(sample);
         JSchParser parser = new JSchParser(reader);
+        parser.setPrintException(false);
         assertTrue(parser.parse());
     }
 
@@ -43,6 +44,7 @@ public class BasicCase extends TestCase {
         String sample = "{}";
         StringReader reader = new StringReader(sample);
         JSchParser parser = new JSchParser(reader);
+        parser.setPrintException(false);
         assertTrue(!parser.parse());
     }
 
@@ -60,6 +62,7 @@ public class BasicCase extends TestCase {
                         "}";
         StringReader reader = new StringReader(sample);
         JSchParser parser = new JSchParser(reader);
+        parser.setPrintException(false);
         assertTrue(parser.parse());
     }
 }

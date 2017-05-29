@@ -210,7 +210,8 @@ address : 'w' ;
 
 	private Yylex lexer;
 	private String file;
-	private boolean verbose;
+	private Boolean verbose;
+	private Boolean printException;
 
 	//private Stack<Integer> pRot = new Stack<Integer>();
 	//private int proxRot = 1;
@@ -260,6 +261,7 @@ address : 'w' ;
 		lexer = new Yylex(r, this);
 		semValidator = new JSchSemantics();
 		this.verbose = false;
+		this.printException = true;
 	}
 
 	private void initialize(){
@@ -284,6 +286,10 @@ address : 'w' ;
 		this.verbose = verbose;
 	}
 
+	public void setPrintException(boolean printException) {
+		this.printException = printException;
+	}
+
 	public boolean parse(){
 		initialize();
 		boolean result = (yyparse() == 0);
@@ -295,7 +301,8 @@ address : 'w' ;
 			}
 			catch(Exception ex){
 				pfsHandler = null;
-				System.out.println(ex);
+				if(this.printException)
+					System.out.println(ex);
 			}
 		}
 		else{

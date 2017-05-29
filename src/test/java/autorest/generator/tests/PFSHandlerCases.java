@@ -47,6 +47,7 @@ public class PFSHandlerCases extends TestCase {
 						"}";
 		StringReader reader = new StringReader(sample);
 		JSchParser parser = new JSchParser(reader);
+		parser.setPrintException(false);
 		assertTrue(parser.parse());
 		PFSHandler pfsHandler = parser.getPFSHandler();
 		assertTrue(pfsHandler != null);
@@ -73,6 +74,7 @@ public class PFSHandlerCases extends TestCase {
 						"}";
 		StringReader reader = new StringReader(sample);
 		JSchParser parser = new JSchParser(reader);
+		parser.setPrintException(false);
 		assertTrue(parser.parse());
 		PFSHandler pfsHandler = parser.getPFSHandler();
 		assertTrue(pfsHandler != null);

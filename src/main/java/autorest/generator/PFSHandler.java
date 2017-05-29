@@ -46,15 +46,14 @@ public class PFSHandler {
 		return this.resources;
 	}
 
-	private void loadResources(){
+	private void loadResources() throws Exception{
 		for (String name : this.defs.keySet()) {
 			try {
 				Resource res = new Resource(name, this.defs.get(name).clone(), this);
 				this.resources.put(name, res);
 			}
 			catch (Exception e) {
-				System.out.println("Exception while loading "+name+"\n"+e.getMessage());
-				e.printStackTrace();
+				throw new Exception("Exception while loading [" + name + "] in the PFSHandler processor.");
 			}
 		}
 	}
