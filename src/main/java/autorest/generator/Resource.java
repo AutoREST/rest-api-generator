@@ -34,17 +34,20 @@ public class Resource {
 		this.restrictions = restrictions;
 		this.properties = this.restrictions.getProperties();
 		this.required = this.restrictions.getRequired();
-		if(this.required == null)
-			this.required = new ArrayList<>();
 		this.dependencies = this.restrictions.getDependencies();
-		if(this.dependencies == null)
-			this.dependencies = new HashMap<>();
 		this.primaryKeys = new ArrayList<>();
 		this.navegableProps = new ArrayList<>();
 		this.arrayProps = new ArrayList<>();
 		this.references = new HashMap<>();
 		this.referencedBy = new ArrayList<>();
 		this.specializations = new ArrayList<>();
+		//to avoid NPEs
+		if(this.properties == null)
+			this.properties = new HashMap<>();
+		if(this.required == null)
+			this.required = new ArrayList<>();
+		if(this.dependencies == null)
+			this.dependencies = new HashMap<>();
 
 		this.defineReferences(pfsh);
 		if(this.parentResource == null)

@@ -52,6 +52,7 @@ public class GeneratorTool {
 			PFSHandler pfsh = yyparser.getPFSHandler();
 			if(pfsh != null){
 				this.loadSnippets();
+				pfsh.initializeResources();
 				StringBuilder routes = new StringBuilder();
 				StringBuilder routers_requires = new StringBuilder();
 				Map<String, ModelBuilder> models = new HashMap<>();

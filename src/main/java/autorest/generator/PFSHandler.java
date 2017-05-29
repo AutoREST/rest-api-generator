@@ -26,6 +26,9 @@ public class PFSHandler {
 			this.mJSch = new JSchRestriction();
 		this.resolvableRefs = false;
 		this.resolveMessage = "Didn't tried to resolve.";
+	}
+
+	public void initializeResources() throws Exception{
 		this.loadResources();
 		this.resolveResourcesReferences();
 	}
