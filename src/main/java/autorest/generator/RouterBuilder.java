@@ -52,7 +52,7 @@ public class RouterBuilder {
 		router = router.replace("{{query_building}}", queryBuilder);
 		router = router.replace("{{identifier_check}}", "");
 		if(this.resource.hasParent())
-			router = router.replace("{{query_by_type}}", "query.type='"+this.resource.getName()+"';");
+			router = router.replace("{{query_by_type}}", "query.__type='"+this.resource.getName()+"';");
 		else
 			router = router.replace("{{query_by_type}}", "");
 		router = router.replace("{{resource_name}}", this.resource.getName());

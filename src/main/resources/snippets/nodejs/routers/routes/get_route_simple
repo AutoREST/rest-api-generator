@@ -1,12 +1,14 @@
 router.get('/{{resource_name}}/', function(req, res) {
 	var query = {};
 {{query_building}}
+	var queryMinLen = 0;
 	{{query_by_type}}
+	if(query.__type) queryMinLen++;
 	{{model_name}}.find(query, function(err, docs) {
 		if (err) {
 			res.status(400).send();
 		} else {
-			if (Object.keys(query).length > 0 && docs.length === 0) {
+			if (Object.keys(query).length > queryMinLen && docs.length === 0) {
 				res.status(404).send();
 			} else {
 				var fullUrl = req.protocol + '://' + req.get('host') + req.baseUrl;

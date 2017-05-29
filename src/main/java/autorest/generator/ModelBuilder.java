@@ -32,9 +32,9 @@ public class ModelBuilder {
 		Boolean generic = this.resource.hasSpecializations();
 		Boolean specialization = this.resource.hasParent();
 		if(generic || specialization)
-			deleteType = "delete doc.type";
+			deleteType = "delete doc.__type";
 		if(specialization)
-			typeField = (fields.length()>0 ? "," : "")+"type: {type: String, default: '"+this.resource.getName()+"'}";
+			typeField = (fields.length()>0 ? "," : "")+"__type: {type: String, default: '"+this.resource.getName()+"'}";
 		String refRes = "";
 		String arraysItems = "";
 		String arraysLinks = "";
