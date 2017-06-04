@@ -9,7 +9,8 @@ public class RouterBuilder {
 
 	private Resource resource;
 	private String resourceId = "";
-	private String router, head_route, get_route, get_route_prop, post_route, put_route, patch_route, delete_route;
+	private String router, head_route, get_route, post_route, put_route, patch_route, delete_route;
+	private String head_route_prop, get_route_prop, put_route_prop, patch_route_prop, delete_route_prop;
 	private Map<String, String> snippets;
 	private String queryBuilder;
 	private String reqValBody;
@@ -25,12 +26,10 @@ public class RouterBuilder {
 		this.buildPropsBasedReplacements();
 
 		post_route = post_route.replace("{{request_validation}}", reqValBody);
-		post_route = post_route.replace("{{id_field_name}}", resourceId);
 		post_route = post_route.replace("{{required_fields}}", requiredFieldsData);
 		post_route = post_route.replace("{{not_required_fields}}", notRequiredFieldsData);
 
 		put_route = put_route.replace("{{request_validation}}", reqValQuery);
-		put_route = put_route.replace("{{id_field_name}}", resourceId);
 		put_route = put_route.replace("{{required_fields}}", requiredFieldsData);
 		put_route = put_route.replace("{{not_required_fields}}", notRequiredFieldsData);
 
@@ -43,11 +42,11 @@ public class RouterBuilder {
 
 		router = router.replace("{{head_route}}", head_route);
 		router = router.replace("{{get_route}}", get_route);
-		router = router.replace("{{get_route_props}}", buildPropertiesEndpoints());
 		router = router.replace("{{post_route}}", post_route);
 		router = router.replace("{{put_route}}", put_route);
 		router = router.replace("{{patch_route}}", patch_route);
 		router = router.replace("{{delete_route}}", delete_route);
+		router = router.replace("{{props_routes}}", buildPropertiesEndpoints());
 
 		router = router.replace("{{query_building}}", queryBuilder);
 		router = router.replace("{{identifier_check}}", "");
@@ -55,6 +54,7 @@ public class RouterBuilder {
 			router = router.replace("{{query_by_type}}", "query.__type='"+this.resource.getName()+"';");
 		else
 			router = router.replace("{{query_by_type}}", "");
+		router = router.replace("{{id_field_name}}", resourceId);
 		router = router.replace("{{resource_name}}", this.resource.getName());
 		router = router.replace("{{model_name}}", this.resource.getModelName());
 	}
@@ -65,7 +65,11 @@ public class RouterBuilder {
 				this.resourceId = this.resource.getPrimaryKey();
 			this.head_route = this.snippets.get("head_route_simple");
 			this.get_route = this.snippets.get("get_route_simple");
+			this.head_route_prop = this.snippets.get("head_route_simple_prop");
 			this.get_route_prop = this.snippets.get("get_route_simple_prop");
+			this.put_route_prop = this.snippets.get("put_route_simple_prop");
+			this.patch_route_prop = this.snippets.get("patch_route_simple_prop");
+			this.delete_route_prop = this.snippets.get("delete_route_simple_prop");
 			this.post_route = this.snippets.get("post_route_simple");
 			this.put_route = this.snippets.get("put_route_simple");
 			this.patch_route = this.snippets.get("patch_route_simple");
@@ -122,8 +126,15 @@ public class RouterBuilder {
 
 	public String buildPropertiesEndpoints() throws Exception{
 		StringBuilder props = new StringBuilder();
-		for (String propName : this.resource.getPropertiesEndpoints())
+		List<String> arrayProps = this.resource.getArrayProps();
+		for (String propName : this.resource.getPropertiesEndpoints()){
+			props.append(this.head_route_prop.replace("{{prop_name}}", propName)+"\n");
 			props.append(this.get_route_prop.replace("{{prop_name}}", propName)+"\n");
+			props.append(this.put_route_prop.replace("{{prop_name}}", propName)+"\n");
+			if(arrayProps.contains(propName))//only patch a property if it's an array
+				props.append(this.patch_route_prop.replace("{{prop_name}}", propName)+"\n");
+			props.append(this.delete_route_prop.replace("{{prop_name}}", propName)+"\n");
+		}
 		return props.toString();
 	}
 

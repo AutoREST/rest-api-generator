@@ -21,12 +21,6 @@ public class ModelBuilder {
 		}
 		String fields = buildFields(this.resource.getProperties());
 
-		String propsH = "";
-		List<String> navProps = this.resource.getNavegableProperties();
-		if(!navProps.isEmpty() && this.resource.isSimpleKey()){
-			for (String propName : navProps)
-				propsH += snippets.get("prop_hyperlink").replace("{{prop_name}}", propName);
-		}
 		String deleteType = "";
 		String typeField = "";
 		Boolean generic = this.resource.hasSpecializations();
@@ -35,11 +29,21 @@ public class ModelBuilder {
 			deleteType = "delete doc.__type";
 		if(specialization)
 			typeField = (fields.length()>0 ? "," : "")+"__type: {type: String, default: '"+this.resource.getName()+"'}";
+		String propsH = "";
 		String refRes = "";
 		String arraysItems = "";
 		String arraysLinks = "";
 		List<String> arrayProps = this.resource.getArrayProps();
 		Map<String, Reference> references = this.resource.getReferences();
+		List<String> navProps = this.resource.getNavegableProperties();
+		if((!navProps.isEmpty() || !arrayProps.isEmpty()) && this.resource.isSimpleKey()){
+			for (String propName : navProps)
+				propsH += snippets.get("prop_hyperlink").replace("{{prop_name}}", propName);
+
+			for (String propName : arrayProps)//for simple arrays that will be skipped by the references generation
+				if(!references.keySet().contains(propName))
+					propsH += snippets.get("prop_hyperlink").replace("{{prop_name}}", propName);
+		}
 		if(!references.isEmpty()){
 			for (String propName : references.keySet()) {
 				if(!arrayProps.contains(propName)){

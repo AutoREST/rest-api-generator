@@ -103,7 +103,6 @@ public class GeneratorTool {
 		this.snippets.put("router", getResourseAsString("/snippets/nodejs/routers/router.js"));
 		this.snippets.put("model", getResourseAsString("/snippets/nodejs/models/model.js"));
 		this.snippets.put("get_route_simple", getResourseAsString("/snippets/nodejs/routers/routes/get_route_simple"));
-		this.snippets.put("get_route_simple_prop", getResourseAsString("/snippets/nodejs/routers/routes/get_route_simple_prop"));
 		this.snippets.put("get_route_multi", getResourseAsString("/snippets/nodejs/routers/routes/get_route_multi"));
 		this.snippets.put("head_route_simple", getResourseAsString("/snippets/nodejs/routers/routes/head_route_simple"));
 		this.snippets.put("head_route_multi", getResourseAsString("/snippets/nodejs/routers/routes/head_route_multi"));
@@ -115,6 +114,11 @@ public class GeneratorTool {
 		this.snippets.put("patch_route_multi", getResourseAsString("/snippets/nodejs/routers/routes/patch_route_multi"));
 		this.snippets.put("delete_route_simple", getResourseAsString("/snippets/nodejs/routers/routes/delete_route_simple"));
 		this.snippets.put("delete_route_multi", getResourseAsString("/snippets/nodejs/routers/routes/delete_route_multi"));
+		this.snippets.put("head_route_simple_prop", getResourseAsString("/snippets/nodejs/routers/routes/head_route_simple_prop"));
+		this.snippets.put("get_route_simple_prop", getResourseAsString("/snippets/nodejs/routers/routes/get_route_simple_prop"));
+		this.snippets.put("put_route_simple_prop", getResourseAsString("/snippets/nodejs/routers/routes/put_route_simple_prop"));
+		this.snippets.put("patch_route_simple_prop", getResourseAsString("/snippets/nodejs/routers/routes/patch_route_simple_prop"));
+		this.snippets.put("delete_route_simple_prop", getResourseAsString("/snippets/nodejs/routers/routes/delete_route_simple_prop"));
 		this.snippets.put("add_prop_query", getResourseAsString("/snippets/nodejs/lines/add_prop_query"));
 		this.snippets.put("add_prop_data", getResourseAsString("/snippets/nodejs/lines/add_prop_data"));
 		this.snippets.put("req_val_body", getResourseAsString("/snippets/nodejs/lines/request_validation_prop_body"));

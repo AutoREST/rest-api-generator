@@ -29,7 +29,7 @@ public class Resource {
 
 	public Resource(String name, JSchRestriction restrictions, PFSHandler pfsh) throws Exception{
 		this.parentResource = null;
-		this.name = name;
+		this.name = name.toLowerCase();
 		this.collectionName = this.name;
 		this.restrictions = restrictions;
 		this.properties = this.restrictions.getProperties();
@@ -122,19 +122,18 @@ public class Resource {
 						Reference refObj = getReference(sameItems.getRef());
 						Boolean inheritance = refObj.getResourceName() != null && refObj.getPropertyName() == null;
 						if(!inheritance){
-							this.arrayProps.add(name);
 							this.references.put(name, refObj);
 						}
 						else{
 							throw new Exception("Inheritance is invalid inside an array ("+this.name+"/"+name+").");
 						}
 					}
-					else {
-						this.navegableProps.add(name);
-					}
+					this.arrayProps.add(name);
 				}
 			}
-			if(prop.getFirstType() == JSONType.OBJECT && !this.references.keySet().contains(name)){
+			if(prop.getFirstType() == JSONType.OBJECT
+				&& !this.references.keySet().contains(name)
+				&& !this.inheritanceProp.equals(name)){
 				this.navegableProps.add(name);
 			}
 		}
@@ -194,7 +193,10 @@ public class Resource {
 	}
 
 	public void replaceProperty(String name, JSchRestriction newValue){
-		this.properties.put(name, newValue);
+		if(this.arrayProps.contains(name))
+			this.properties.get(name).setSameItems(newValue);
+		else
+			this.properties.put(name, newValue);
 	}
 
 	public List<String> getRequired(){
