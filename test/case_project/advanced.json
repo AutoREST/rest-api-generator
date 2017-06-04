@@ -3,33 +3,62 @@
 		"person" : {
 			"type" : "object",
 			"properties" : {
-				"identity" : {
-					"type" : "integer"
-				},
-				"first_name" : {
-					"type" : "string"
-				},
-				"last_name" : {
-					"type" : "string"
-				}
+				"identity" : { "type" : "integer" },
+				"first_name" : { "type" : "string" },
+				"last_name" : { "type" : "string" }
 			},
 			"required" : ["identity", "first_name", "last_name"],
-			"dependencies" : {
-				"first_name" : ["identity"],
-				"last_name" : ["identity"]
-			}
+			"dependencies" : { "first_name" : ["identity"], "last_name" : ["identity"] }
 		},
 		"student" : {
 			"type" : "object",
 			"properties" : {
-				"person" : { "$ref" : "#/definitions/person"}
+				"person" : { "$ref" : "#/definitions/person" },
+				"awards" : { "type" : "array", "items" : { "type" : "string" } },
+				"projects" : {
+					"type" : "array",
+					"items" : { "$ref" : "#/definitions/project/properties/code" }
+				}
 			}
 		},
 		"professor" : {
 			"type" : "object",
 			"properties" : {
-				"person" : { "$ref" : "#/definitions/person"}
+				"person" : { "$ref" : "#/definitions/person" },
+				"degree" : { "type" : "string" }
 			}
+		},
+		"classroom" : {
+			"type" : "object",
+			"properties" :{
+				"code" : { "type" : "string" },
+				"name" : { "type" : "string" },
+				"professor" : { "$ref" : "#/definitions/professor/properties/identity" }
+			},
+			"required" : ["code", "name", "professor"],
+			"dependencies" : { "name" : ["code"], "professor" : ["code"] }
+		},
+		"grades" : {
+			"type" : "object",
+			"properties" : {
+				"student" : { "$ref" : "#/definitions/student/properties/identity" },
+				"classroom" : { "$ref" : "#/definitions/classroom/properties/code" },
+				"G1" : { "type" : "number" },
+				"G2" : { "type" : "number" }
+			},
+			"required" : ["student", "classroom"],
+			"dependencies" : { "G1" : ["student", "classroom"], "G2" : ["student", "classroom"] }
+		},
+		"project" : {
+			"type" : "object",
+			"properties" : {
+				"code" : { "type" : "string" },
+				"name" : { "type" : "string" },
+				"description" : { "type" : "string" },
+				"professor" : { "$ref" : "#/definitions/professor/properties/identity" }
+			},
+			"required" : ["code", "name", "description", "professor"],
+			"dependencies" : { "name" : ["code"], "description" : ["code"], "professor" : ["code"] }
 		}
 	},
 	"type" : "object"
