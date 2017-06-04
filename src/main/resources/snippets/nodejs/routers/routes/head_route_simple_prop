@@ -1,4 +1,4 @@
-router.head('/{{resource_name}}/:identifier', function(req, res) {
+router.head('/{{resource_name}}/:identifier/{{prop_name}}', function(req, res) {
 	var query = {
 		_id: req.params.identifier
 	};
@@ -8,7 +8,8 @@ router.head('/{{resource_name}}/:identifier', function(req, res) {
 			res.status(400).send();
 		}
 		else{
-			if(docs && docs.length > 0)
+			var hasData = docs && docs.length > 0 && docs[0].{{prop_name}} && docs[0].{{prop_name}}.length > 0;
+			if(hasData)
 				res.status(200).send();
 			else
 				res.status(404).send();

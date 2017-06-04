@@ -26,15 +26,15 @@ router.get('/{{resource_name}}/:identifier', function(req, res) {
 		_id: req.params.identifier
 	};
 	{{query_by_type}}
-	{{model_name}}.find(query, function(err, doc) {
+	{{model_name}}.find(query, function(err, docs) {
 		if (err){
 			res.status(400).send();
 		}
 		else{
-			if(doc){
+			if(docs && docs.length > 0){
 				var fullUrl = req.protocol + '://' + req.get('host') + req.baseUrl;
 				var depth = req.get('Depth');
-				res.status(200).json(doc.cleanObject(fullUrl, depth));
+				res.status(200).json(docs[0].cleanObject(fullUrl, depth));
 			}
 			else
 				res.status(404).send();

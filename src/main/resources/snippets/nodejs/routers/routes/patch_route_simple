@@ -4,11 +4,12 @@ router.patch('/{{resource_name}}/:identifier', function(req, res) {
 		_id: req.params.identifier
 	};
 	{{query_by_type}}
-	{{model_name}}.find(query, function(err, data) {
+	{{model_name}}.find(query, function(err, docs) {
 		if (err) {
 			res.status(400).send(err);
 		} else {
-			if (data) {
+			if (docs && docs.length > 0) {
+				var data = docs[0];
 				{{all_fields}}
 				data.save(function(err) {
 					if (err){

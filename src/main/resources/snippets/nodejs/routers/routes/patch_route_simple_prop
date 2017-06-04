@@ -1,0 +1,30 @@
+router.patch('/{{resource_name}}/:identifier/{{prop_name}}', function(req, res) {
+	var query = {
+		_id: req.params.identifier
+	};
+	{{query_by_type}}
+	{{model_name}}.find(query, function(err, docs) {
+		if (err)
+			res.status(400).send();
+		else
+			if(docs && docs.length > 0){
+				var doc = docs[0];
+				var a = doc.{{prop_name}}.concat(req.body.{{prop_name}});
+				for(var i=0; i<a.length; ++i) {
+					for(var j=i+1; j<a.length; ++j) {
+						if(a[i] === a[j])
+							a.splice(j--, 1);
+					}
+				}
+				doc.{{prop_name}} = a;
+				doc.save(function(err) {
+					if(err)
+						res.status(400).send();
+					else
+						res.status(201).send({{{prop_name}}: doc.cleanObject().{{prop_name}}});
+				});
+			}
+			else
+				res.status(404).send();
+	});
+});

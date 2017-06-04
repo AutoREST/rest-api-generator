@@ -1,0 +1,38 @@
+router.delete('/{{resource_name}}/:identifier/{{prop_name}}', function(req, res) {
+	var query = {
+		_id: req.params.identifier
+	};
+	{{query_by_type}}
+	{{model_name}}.find(query, function(err, docs) {
+		if (err)
+			res.status(400).send();
+		else
+			if(docs && docs.length > 0){
+				var doc = docs[0];
+				var sendNew = false;
+				if(req.body.{{prop_name}}){
+					for (var i = 0; i < doc.{{prop_name}}.length; i++) {
+						for (var j = 0; j < req.body.{{prop_name}}.length; j++) {
+							if(doc.{{prop_name}}[i] === req.body.{{prop_name}}[j])
+								doc.{{prop_name}}.splice(i--, 1);
+						}
+					}
+					sendNew = true;
+				}
+				else
+					doc.{{prop_name}} = undefined;
+				doc.save(function(err) {
+					if(err)
+						res.status(400).send();
+					else{
+						if(sendNew)
+							res.status(200).send({{{prop_name}}: doc.{{prop_name}}});
+						else
+							res.status(204).send();
+					}
+				});
+			}
+			else
+				res.status(404).send();
+	});
+});
