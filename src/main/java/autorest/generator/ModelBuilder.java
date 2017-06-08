@@ -14,10 +14,18 @@ public class ModelBuilder {
 		this.resource = res;
 
 		String id_virtual = "";
+		String multikeyIndex = "";
 		this.primaryKey = "";
 		if(this.resource.isSimpleKey()){
 			id_virtual = snippets.get("id_virtual");
 			this.primaryKey = this.resource.getPrimaryKey();
+		}
+		else {
+			List<String> arrIndexKeys = new ArrayList<>();
+			for (String key : this.resource.getPrimaryKeys())
+				arrIndexKeys.add(key + ": 1");
+			String indexKeys = String.join(",", arrIndexKeys);
+			multikeyIndex = "{{model_name}}Schema.index({" + indexKeys + "}, { unique: true });";
 		}
 		String fields = buildFields(this.resource.getProperties());
 
@@ -67,6 +75,7 @@ public class ModelBuilder {
 		}
 		this.modelFile = snippets.get("model");
 		this.modelFile = this.modelFile.replace("{{fields}}", fields);
+		this.modelFile = this.modelFile.replace("{{multikey_unique_index}}",multikeyIndex);
 		this.modelFile = this.modelFile.replace("{{id_virtual}}", id_virtual);
 		this.modelFile = this.modelFile.replace("{{delete_type}}", deleteType);
 		this.modelFile = this.modelFile.replace("{{type_field}}", typeField);
@@ -81,7 +90,7 @@ public class ModelBuilder {
 	}
 
 	public String buildFields(Map<String, JSchRestriction> props) throws Exception{
-		String fields = "";
+		List<String> fields = new ArrayList<>();
 		for (String name : props.keySet()) {
 			String fieldName;
 			Boolean isRequired = this.resource.getRequired().contains(name);
@@ -90,34 +99,75 @@ public class ModelBuilder {
 			else
 				fieldName = name;
 			JSchRestriction prop = props.get(name);
-			fields += buildField(prop, fieldName, isRequired) + ",\n";
+			fields.add(buildField(prop, fieldName, isRequired));
 		}
-		if(fields.length()>0)
-			fields = fields.substring(0, fields.length()-2);
-		return fields;
+		return String.join(",\n", fields);
 	}
 
 	public String buildField(JSchRestriction prop, String fieldName, Boolean isRequired) throws Exception{
 		String field = "";
 		field = fieldName + ":{";
-		switch (prop.getFirstType()) {
-			case ARRAY:
-				JSchRestriction sameItems = prop.getSameItems();
-				if(sameItems != null){
-					field += "type: ["+sameItems.getFirstType().toMongooseType()+"]";
-				}
-				break;
-			case INTEGER:
-				field += "integer: true, ";
-			default:
-				field += "type: " + prop.getFirstType().toMongooseType();
-				break;
-		}
+		field += buildMongooseSchema(prop);
 		if(isRequired)
 			field += ", required: true";
 
 		field += "}";
 		return field;
+	}
+
+	private String buildMongooseSchema(JSchRestriction prop){
+		List<String> schemaProps = new ArrayList<>();
+		JSONType type =  prop.getFirstType();
+		if(type == JSONType.ARRAY){
+			JSchRestriction sameItems = prop.getSameItems();
+			if(sameItems != null)
+				schemaProps.add("type: [{" + buildMongooseSchema(sameItems) + "}]");
+			List<String> validations = new ArrayList<>();
+			/*TODO: The following comments are possible messages to the validations, they would be availavle in variable `err`, as in: err.errors[{{prop_name}}].properties.message
+			§§§§§ , msg:'{PATH} should be at least {{value}}.'
+			§§§§§ , msg:'{PATH} limit is {{value}}.'
+			*/
+			Integer value = prop.getMinItems();
+			if(value != null)
+				validations.add("{validator: function(v){return v.length >= {{value}};}}".replace("{{value}}", value.toString()));
+			value = prop.getMaxItems();
+			if(value != null)
+				validations.add("{validator: function(v){return v.length <= {{value}};}}".replace("{{value}}", value.toString()));
+			if(validations.size() > 0)
+				schemaProps.add("validate: ["+String.join(",\n", validations)+"]");
+		}
+		else{
+			schemaProps.add("type: " + type.toMongooseType());
+			if(type == JSONType.STRING){
+				Integer value = prop.getMinLength();
+				if(value != null)
+					schemaProps.add("minlength: " + value);
+				value = prop.getMaxLength();
+				if(value != null)
+					schemaProps.add("maxlength: " + value);
+				//TODO: add patterns, but they are a fight with BYACC too...
+			}
+			else if(type == JSONType.INTEGER || type == JSONType.NUMBER){
+				if(type == JSONType.INTEGER)
+					schemaProps.add("integer: true");
+				Double value = prop.getMaximum();
+				if (value != null) {
+					Boolean ex = prop.getExMaximum();
+					if(ex != null && ex)
+						value--;
+					schemaProps.add("max: " + value);
+				}
+				value = prop.getMinimum();
+				if (value != null) {
+					Boolean ex = prop.getExMinimum();
+					if(ex != null && ex)
+						value++;
+					schemaProps.add("min: " + value);
+				}
+			}
+		}
+		String schema = String.join(",", schemaProps);
+		return schema;
 	}
 
 	public String toString(){

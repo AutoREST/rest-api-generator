@@ -5,63 +5,20 @@ var mongoose = require('mongoose'),
 var {{model_name}}Schema = new Schema({
 	{{fields}}
 	{{type_field}}
-    // _id: {
-    //     type: Number,
-    //     integer: true,
-    //     required: true,
-    //     unique: true
-    // },
-    // attribute1: {
-    //     type: Boolean,
-    //     required: true
-    // },
-    // attribute2: {
-    //     type: Number,
-    //     integer: true,
-    //     minimum: 0,
-    //     maximum: 255
-    // },
-    // attribute3: {
-    //     type: String,
-    //     maxlength: 1,
-    //     required: true
-    // },
-    // attribute4: {
-    //     type: Number,
-    //     required: true
-    // },
-    // attribute5: {
-    //     type: Number,
-    //     required: true
-    // },
-    // attribute6: {
-    //     type: Number,
-    //     integer: true,
-    //     required: true
-    // },
-    // attribute7: {
-    //     type: Number,
-    //     integer: true,
-    //     required: true
-    // },
     // attribute8: { type: [Number], integer: true },
     // attribute9: {
     //     type: Date,
-    //     required: true
     // },
     // attribute10: {
     //     type: Object,
-    //     required: true
     // },
     // attribute11: {
     //     type: String,
-    //     minlength: 3,
-    //     maxlength: 140,
     //     match: /^[a-zA-Z]*$/,
-    //     required: true
     // }
 });
 
+{{multikey_unique_index}}
 {{id_virtual}}
 {{model_name}}Schema.plugin(integerValidator);
 
