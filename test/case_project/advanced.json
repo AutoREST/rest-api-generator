@@ -14,7 +14,13 @@
 			"type" : "object",
 			"properties" : {
 				"person" : { "$ref" : "#/definitions/person" },
-				"awards" : { "type" : "array", "items" : { "type" : "string" } },
+				"awards" : {
+					"type" : "array",
+					"items" : {
+						"type" : "string"
+					},
+					"maxItems":5
+				},
 				"projects" : {
 					"type" : "array",
 					"items" : { "$ref" : "#/definitions/project/properties/code" }
@@ -52,13 +58,14 @@
 		"project" : {
 			"type" : "object",
 			"properties" : {
-				"code" : { "type" : "string" },
-				"name" : { "type" : "string" },
+				"code" : { "type" : "string", "maxLength":5},
+				"name" : { "type" : "string", "minLength":5},
 				"description" : { "type" : "string" },
-				"professor" : { "$ref" : "#/definitions/professor/properties/identity" }
+				"professor" : { "$ref" : "#/definitions/professor/properties/identity" },
+				"categories": {"type":"array", "items": {"type":"integer"}}
 			},
 			"required" : ["code", "name", "description", "professor"],
-			"dependencies" : { "name" : ["code"], "description" : ["code"], "professor" : ["code"] }
+			"dependencies" : { "name" : ["code"], "description" : ["code"], "professor" : ["code"], "categories" : ["code"] }
 		}
 	},
 	"type" : "object"

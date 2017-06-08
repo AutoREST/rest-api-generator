@@ -126,14 +126,16 @@ public class RouterBuilder {
 
 	public String buildPropertiesEndpoints() throws Exception{
 		StringBuilder props = new StringBuilder();
-		List<String> arrayProps = this.resource.getArrayProps();
-		for (String propName : this.resource.getPropertiesEndpoints()){
-			props.append(this.head_route_prop.replace("{{prop_name}}", propName)+"\n");
-			props.append(this.get_route_prop.replace("{{prop_name}}", propName)+"\n");
-			props.append(this.put_route_prop.replace("{{prop_name}}", propName)+"\n");
-			if(arrayProps.contains(propName))//only patch a property if it's an array
-				props.append(this.patch_route_prop.replace("{{prop_name}}", propName)+"\n");
-			props.append(this.delete_route_prop.replace("{{prop_name}}", propName)+"\n");
+		if(this.resource.isSimpleKey()){
+			List<String> arrayProps = this.resource.getArrayProps();
+			for (String propName : this.resource.getPropertiesEndpoints()){
+				props.append(this.head_route_prop.replace("{{prop_name}}", propName)+"\n");
+				props.append(this.get_route_prop.replace("{{prop_name}}", propName)+"\n");
+				props.append(this.put_route_prop.replace("{{prop_name}}", propName)+"\n");
+				if(arrayProps.contains(propName))//only patch a property if it's an array
+					props.append(this.patch_route_prop.replace("{{prop_name}}", propName)+"\n");
+				props.append(this.delete_route_prop.replace("{{prop_name}}", propName)+"\n");
+			}
 		}
 		return props.toString();
 	}
