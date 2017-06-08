@@ -11,7 +11,8 @@ router.put('/{{resource_name}}/:identifier', function(req, res) {
 		query,
 		data, {
 			new: true,
-			upsert: true
+			upsert: true,
+			runValidators: true
 		},
 		function(err, doc) {
 			if (err)

@@ -12,7 +12,8 @@ router.put('/{{resource_name}}', function(req, res) {
 			query,
 			data, {
 				new: true,
-				upsert: true
+				upsert: true,
+				runValidators: true
 			},
 			function(err) {
 				if (err)
