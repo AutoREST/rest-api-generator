@@ -64,6 +64,7 @@ public class GeneratorTool {
 				for (String resourceName : resources.keySet()) {
 					Resource res = resources.get(resourceName);
 					ModelBuilder model = new ModelBuilder(res, this.snippets);
+					resourceName = res.getName();
 					models.put(resourceName, model);
 					routers.put(resourceName, new RouterBuilder(res, this.snippets));
 

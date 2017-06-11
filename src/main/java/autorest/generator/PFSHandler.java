@@ -56,7 +56,7 @@ public class PFSHandler {
 				this.resources.put(name, res);
 			}
 			catch (Exception e) {
-				throw new Exception("Exception while loading [" + name + "] in the PFSHandler processor.");
+				throw new Exception("Exception while loading [" + name + "] in the PFSHandler processor. " + e.getMessage());
 			}
 		}
 	}

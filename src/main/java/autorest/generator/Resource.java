@@ -67,7 +67,7 @@ public class Resource {
 	}
 
 	private void setPrimaryKeys() throws Exception{
-		if(dependencies != null){
+		if(dependencies != null && !dependencies.isEmpty()){
 			for (String p : dependencies.keySet()) {
 				List<String> kwords = dependencies.get(p).getKwords();
 				if(kwords != null){
@@ -78,6 +78,11 @@ public class Resource {
 				}
 			}
 		}
+		else
+			for (String p : properties.keySet())
+				if(!this.primaryKeys.contains(p))
+					this.primaryKeys.add(p);
+
 		if(this.primaryKeys.isEmpty())
 			throw new Exception("A resource must have a primary key!");
 		this.primaryKey = "";
