@@ -134,7 +134,6 @@ public class GeneratorTool {
 		Path currentRelativePath = Paths.get("");
 		String absotultePath = currentRelativePath.toAbsolutePath().toString();
 		String zipFile = Paths.get(absotultePath, apiName + ".zip").toAbsolutePath().toString();
-		System.out.println("zipFile: " + zipFile);
 
 		FileOutputStream fos = new FileOutputStream(zipFile);
 		ZipOutputStream zos = new ZipOutputStream(fos);
