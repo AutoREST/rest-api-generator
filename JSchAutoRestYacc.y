@@ -56,8 +56,11 @@ JSDoc : '{' '"' idDefJSch '}' 	{	if(verbose){
 
 idDefJSch 	:	id ',' '"' defsJSch
 			|	defsJSch ;
-defsJSch	:	defs  ',' '"' JSchD { mainJSchema = (JSchRestriction)$4; };
+defsJSch	:	defs mJSch;
 			|	JSchD { mainJSchema = (JSchRestriction)$1;};
+
+mJSch		:
+			|	',' '"' JSchD { mainJSchema = (JSchRestriction)$3;};
 
 id : ID '"' ':' '"' uri '"' ;
 
