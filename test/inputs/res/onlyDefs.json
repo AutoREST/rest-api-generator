@@ -1,0 +1,17 @@
+{
+	"definitions" : {
+		"project" : {
+			"type" : "object",
+			"properties" : {
+				"code" : { "type" : "string", "maxLength":2},
+				"name": {
+					"type": "string"
+				}
+			},
+			"required": ["code"],
+			"dependencies": {
+				"name": ["code"]
+			}
+		}
+	}
+}

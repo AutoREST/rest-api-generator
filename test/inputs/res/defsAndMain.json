@@ -1,0 +1,41 @@
+{
+	"definitions" : {
+		"project" : {
+			"type" : "object",
+			"properties" : {
+				"code" : { "type" : "string", "maxLength":2},
+				"name": {
+					"type": "string"
+				}
+			},
+			"required": ["code", "name"],
+			"dependencies": {
+				"name": ["code"]
+			}
+		},
+		"member": {
+			"type": "object",
+			"properties": {
+				"badge": {
+					"type": "number"
+				},
+				"name": {
+					"type": "string"
+				}
+			},
+			"required": ["badge", "name"],
+			"dependencies": {
+				"name": ["badge"]
+			}
+		}
+	},
+	"properties": {
+		"project": {
+			"$ref" : "#/definitions/project"
+		},
+        "member": {
+			"$ref" : "#/definitions/member"
+		}
+    },
+	"additionalProperties": false
+}

@@ -130,7 +130,7 @@ public class Resource {
 							this.references.put(name, refObj);
 						}
 						else{
-							throw new Exception("Inheritance is invalid inside an array ("+this.name+"/"+name+").");
+							throw new Exception("Inheritance is invalid inside an array ("+this.name+"."+name+").");
 						}
 					}
 					this.arrayProps.add(name);
@@ -138,7 +138,7 @@ public class Resource {
 			}
 			if(prop.getFirstType() == JSONType.OBJECT
 				&& !this.references.keySet().contains(name)
-				&& !this.inheritanceProp.equals(name)){
+				&& !this.name.equals(inheritanceProp)){
 				this.navegableProps.add(name);
 			}
 		}
