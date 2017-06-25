@@ -4,7 +4,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import java.io.StringReader;
-import autorest.generator.JSchParser;
+import autorest.generator.PFISCompiler;
 
 /**
  * Unit test for same basic cases.
@@ -32,7 +32,7 @@ public class BasicCase extends TestCase {
     public void test_BasicStringSchema() {
         String sample = "{\"type\" : \"string\"}";
         StringReader reader = new StringReader(sample);
-        JSchParser parser = new JSchParser(reader);
+        PFISCompiler parser = new PFISCompiler(reader);
         parser.setPrintException(false);
         assertTrue(parser.parse());
     }
@@ -43,7 +43,7 @@ public class BasicCase extends TestCase {
     public void test_EmptySchema() {
         String sample = "{}";
         StringReader reader = new StringReader(sample);
-        JSchParser parser = new JSchParser(reader);
+        PFISCompiler parser = new PFISCompiler(reader);
         parser.setPrintException(false);
         assertTrue(!parser.parse());
     }
@@ -61,7 +61,43 @@ public class BasicCase extends TestCase {
                         	"\"type\" : \"object\""+
                         "}";
         StringReader reader = new StringReader(sample);
-        JSchParser parser = new JSchParser(reader);
+        PFISCompiler parser = new PFISCompiler(reader);
+        parser.setPrintException(false);
+        assertTrue(parser.parse());
+    }
+
+    /**
+     * Test a JSON Schema that has definitions and accepts an object
+     */
+    public void test_SchemaWithDefinitionsAndMaxLength() {
+        String sample = "{"+
+                        	"\"definitions\" : {"+
+                        		"\"name\" : {"+
+                        			"\"type\" : \"string\","+
+                        			"\"maxLength\":5"+
+                        		"}"+
+                        	"},"+
+                        	"\"type\" : \"object\""+
+                        "}";
+        StringReader reader = new StringReader(sample);
+        PFISCompiler parser = new PFISCompiler(reader);
+        parser.setPrintException(false);
+        assertTrue(parser.parse());
+    }
+
+	/**
+     * Test a JSON Schema that has only definitions
+     */
+    public void test_OnlyDefinitions() {
+        String sample = "{"+
+                        	"\"definitions\" : {"+
+                        		"\"name\" : {"+
+                        			"\"type\" : \"string\""+
+                        		"}"+
+                        	"}"+
+                        "}";
+        StringReader reader = new StringReader(sample);
+        PFISCompiler parser = new PFISCompiler(reader);
         parser.setPrintException(false);
         assertTrue(parser.parse());
     }

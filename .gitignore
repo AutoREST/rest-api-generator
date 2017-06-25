@@ -1,4 +1,4 @@
-JSchParser*.java
+PFISCompiler*.java
 Yylex.java
 *.class
 *.output

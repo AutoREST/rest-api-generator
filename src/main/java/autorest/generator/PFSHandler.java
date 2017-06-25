@@ -51,13 +51,13 @@ public class PFSHandler {
 
 	private void loadResources() throws Exception{
 		for (String name : this.defs.keySet()) {
-			try {
+			// try {
 				Resource res = new Resource(name, this.defs.get(name).clone(), this);
 				this.resources.put(name, res);
-			}
-			catch (Exception e) {
-				throw new Exception("Exception while loading [" + name + "] in the PFSHandler processor. ", e);
-			}
+			// }
+			// catch (Exception e) {
+			// 	throw new Exception("Exception while loading [" + name + "] in the PFSHandler processor. ", e);
+			// }
 		}
 	}
 
@@ -73,11 +73,21 @@ public class PFSHandler {
 			Map<String, Reference> references = res.getReferences();
 			for (String propName : references.keySet()) {
 				Reference ref = references.get(propName);
-				if(ref.getPropertyName() != null && ref.getResourceName() != null){
-					Resource refResource = this.resources.get(ref.getResourceName());
-					JSchRestriction newPropJSch = refResource.getProperties().get(ref.getPropertyName());
-					res.replaceProperty(propName, newPropJSch);
-					refResource.addRefferer(new Reference(res, propName));
+				if (ref.getResourceName() != null) {
+					if(ref.getPropertyName() != null){
+						Resource refResource = this.resources.get(ref.getResourceName());
+						JSchRestriction newPropJSch = refResource.getProperties().get(ref.getPropertyName());
+						res.replaceProperty(propName, newPropJSch);
+						refResource.addRefferer(new Reference(res, propName));
+					}
+					else{
+						/*
+						se for simples
+							pega a chave e coloca como prop
+						senao
+							vai ter q colocar a chaves compostas.... so que como iria gerar isto???
+						*/
+					}
 				}
 			}
 			// ensure all references have been addressed

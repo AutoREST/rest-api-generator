@@ -44,13 +44,14 @@ public class GeneratorTool {
 	public GeneratorTool(FileReader file, String optionsJSON) throws Exception{
 		ObjectMapper mapper = new ObjectMapper(); // create once, reuse
 		Options options = mapper.readValue(optionsJSON, Options.class);
-		JSchParser yyparser = new JSchParser(file);
+		PFISCompiler yyparser = new PFISCompiler(file);
 		yyparser.setVerbose(options.Verbose);
 		Boolean parsed = yyparser.parse();
 
 		if (parsed) {
 			PFSHandler pfsh = yyparser.getPFSHandler();
 			if(pfsh != null){
+				//TODO: HTTP Method Stub Library... work on that
 				this.loadSnippets();
 				pfsh.initializeResources();
 				StringBuilder routes = new StringBuilder();
@@ -76,7 +77,7 @@ public class GeneratorTool {
 				apiJs = apiJs.replace("{{routers_requires}}", routers_requires.toString());
 				apiJs = apiJs.replace("{{routes}}", routes.toString());
 				apiJs = apiJs.replace("{{api_database}}", options.DataBaseName);
-
+				//TODO: generate console.log of the GET endpoints of each resource
 				String packageJson = this.snippets.get("package.json");
 				packageJson = packageJson.replace("{{api_repo_url}}", options.APIRepoURL);
 

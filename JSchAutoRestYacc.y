@@ -237,7 +237,7 @@ address : 'w' ;
 	private int yylex () {
 		int yyl_return = -1;
 		try {
-			yylval = new JSchParserVal(0);
+			yylval = new PFISCompilerVal(0);
 			yyl_return = lexer.yylex();
 		}
 		catch (IOException e) {
@@ -255,12 +255,13 @@ address : 'w' ;
 		}
 	}
 
-	public JSchParser(String file) throws IOException {
+	//TODO: rename to PFISCompiler
+	public PFISCompiler(String file) throws IOException {
 		this(new FileReader(file));
 		this.file = file;
 	}
 
-	public JSchParser(Reader r) {
+	public PFISCompiler(Reader r) {
 		lexer = new Yylex(r, this);
 		semValidator = new JSchSemantics();
 		this.verbose = false;

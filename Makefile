@@ -2,24 +2,24 @@
 # byacc/j from http://troi.lincom-asg.com/~rjamison/byacc/
 
 JFLEX  = java -jar JFlex.jar
-BYACCJ = ./yacc.linux -tv -J -Jclass=JSchParser
+BYACCJ = ./yacc.linux -tv -J -Jclass=PFISCompiler
 JAVAC  = javac
 
-all: JSchParser.class
+all: PFISCompiler.class
 
-run: JSchParser.class
-	java JSchParser
+run: PFISCompiler.class
+	java PFISCompiler
 
-build: clean JSchParser.class
+build: clean PFISCompiler.class
 
 clean:
-	rm -f *~ *.class *.o *.s Yylex.java JSchParser*.java y.output
+	rm -f *~ *.class *.o *.s Yylex.java PFISCompiler*.java y.output
 
-JSchParser.class: Yylex.java JSchParser.java
-	$(JAVAC) JSchParser.java
+PFISCompiler.class: Yylex.java PFISCompiler.java
+	$(JAVAC) PFISCompiler.java
 
 Yylex.java: lexical.flex
 	$(JFLEX) lexical.flex
 
-JSchParser.java: JSchAutoRestYacc.y
+PFISCompiler.java: JSchAutoRestYacc.y
 	$(BYACCJ) JSchAutoRestYacc.y

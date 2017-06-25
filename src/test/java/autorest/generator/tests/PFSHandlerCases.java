@@ -4,7 +4,7 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import java.io.StringReader;
-import autorest.generator.JSchParser;
+import autorest.generator.PFISCompiler;
 import autorest.generator.PFSHandler;
 
 /**
@@ -46,7 +46,7 @@ public class PFSHandlerCases extends TestCase {
 							"\"additionalProperties\": false" +
 						"}";
 		StringReader reader = new StringReader(sample);
-		JSchParser parser = new JSchParser(reader);
+		PFISCompiler parser = new PFISCompiler(reader);
 		parser.setPrintException(false);
 		assertTrue(parser.parse());
 		PFSHandler pfsHandler = parser.getPFSHandler();
@@ -73,7 +73,7 @@ public class PFSHandlerCases extends TestCase {
 							"\"additionalProperties\": false" +
 						"}";
 		StringReader reader = new StringReader(sample);
-		JSchParser parser = new JSchParser(reader);
+		PFISCompiler parser = new PFISCompiler(reader);
 		parser.setPrintException(false);
 		assertTrue(parser.parse());
 		PFSHandler pfsHandler = parser.getPFSHandler();

@@ -48,7 +48,7 @@ public class Resource {
 			this.required = new ArrayList<>();
 		if(this.dependencies == null)
 			this.dependencies = new HashMap<>();
-
+		//TODO: validar tipo Object
 		this.defineReferences(pfsh);
 		if(this.parentResource == null)
 			this.setPrimaryKeys();
@@ -104,6 +104,7 @@ public class Resource {
 
 		for (String name : this.properties.keySet()) {
 			JSchRestriction prop = this.properties.get(name);
+			//TODO: validar se tipos sao: \textit{string}, \textit{integer}, \textit{number}, \textit{boolean}, \textit{object} e \textit{array}
 			if(prop.hasRefs() && prop.getRef() != null){
 				Reference refObj = getReference(prop.getRef());
 				Boolean inheritance = refObj.getResourceName() != null && refObj.getPropertyName() == null;
@@ -163,6 +164,7 @@ public class Resource {
 	}
 
 	public void addParentProperties(Resource parent) throws Exception{
+		//TODO: evaluate second level heritance and so on...
 		this.collectionName = parent.getCollectionName();
 		Map<String, JSchRestriction> parentProps = parent.getProperties();
 
