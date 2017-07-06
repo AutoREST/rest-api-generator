@@ -1,0 +1,71 @@
+{
+	"definitions" :{
+		"book" : {
+			"type" : "object",
+			"properties" : {
+				"code" : {
+					"type" : "string"
+				},
+				"author" : {
+					"$ref" : "#/definitions/author/properties/id"
+				},
+				"title" : {
+					"type" : "string"
+				}
+			},
+			"required" : ["code", "title"],
+			"dependencies" : {
+				"author" : ["code"],
+				"title" : ["code"]
+			}
+		},
+		"order" : {
+			"type" : "object",
+			"properties" : {
+				"id" : {
+					"type" : "integer"
+				},
+				"customer" : {
+					"type" : "string"
+				}
+			},
+			"required" : ["id"],
+			"dependencies" : {
+				"customer" : ["id"]
+			}
+		},
+		"order_book" : {
+			"type" : "object",
+			"properties" : {
+				"order_id" : {
+					"$ref" : "#/definitions/order/properties/id"
+				},
+				"book_code" : {
+					"$ref" : "#/definitions/book/properties/code"
+				},
+				"quantity" : {
+					"type" : "integer"
+				}
+			},
+			"required" : ["order_id", "book_code", "quantity"],
+			"dependencies" : {
+				"quantity" : ["order_id", "book_code"]
+			}
+		},
+		"author" : {
+			"type" : "object",
+			"properties" : {
+				"id" : {
+					"type" : "integer"
+				},
+				"name" : {
+					"type" : "string"
+				}
+			},
+			"required" : ["id", "name"],
+			"dependencies" : {
+				"name" : ["id"]
+			}
+		}
+	}
+}

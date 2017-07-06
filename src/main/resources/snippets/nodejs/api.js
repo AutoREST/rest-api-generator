@@ -40,11 +40,23 @@ app.use(bodyParser.urlencoded({
 app.use(methodOverride());
 {{routes}}
 app.get("/",function(req, res) {
-	res.send("Hello from AutoREST");
+	res.send("Hello from {{APIName}}");
 });
+app.get("/api",function(req, res) {
+	res.json({availableResources: availableResources()});
+});
+
+var baseURL= "http://localhost:" + app.get('port');
+function availableResources() {
+	var resourcesGet = [];
+{{resources_get}}
+	return resourcesGet;
+}
 
 app.listen(app.get('port'), function() {
 	process.env.NODE_ENV = app.get('env');
-	var baseURL= "http://localhost:" + app.get('port');
 	console.log("Listening on " + baseURL);
+	var resources = availableResources();
+	for (var r of resources)
+		console.log(`${r.method} ${r.url}`);
 })

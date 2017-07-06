@@ -1,0 +1,1 @@
+	resourcesGet.push({name:'{{resource_name}}', method:'GET', url:`${baseURL}/api/{{resource_name}}/`});

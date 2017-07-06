@@ -119,7 +119,7 @@ public class RouterBuilder {
 		this.reqValQuery = reqValQuerySB.toString();
 		this.allFieldsData = allFieldsDataSB.toString();
 		this.requiredFieldsData = requiredFieldsDataSB.toString();
-		if(!this.resource.isSimpleKey())
+		if(!this.resource.isSimpleKey() && this.requiredFieldsData.length() > 0)
 			this.requiredFieldsData = this.requiredFieldsData.substring(2);//no _id, then no need of the leading ",\n"
 		this.notRequiredFieldsData = notRequiredFieldsDataSB.toString();
 	}

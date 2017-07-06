@@ -1,0 +1,39 @@
+{
+	"definitions":{
+		"father":{
+			"type":"string",
+			"properties":{
+				"id":{
+					"type":"number"
+				},
+				"name":{
+					"type":"string"
+				}
+			},
+			"required":["id", "name"],
+			"dependencies":{
+				"name":["id"]
+			}
+		},
+		"son":{
+			"type":"object",
+			"properties":{
+				"father":{"$ref":"#/definitions/father"},
+				"evolution":{
+					"type":"string"
+				}
+			},
+			"required":["evolution"]
+		},
+		"grandson":{
+			"type":"object",
+			"properties":{
+				"son":{"$ref":"#/definitions/son"},
+				"revolution":{
+					"type":"string"
+				}
+			},
+			"required":["revolution"]
+		}
+	}
+}

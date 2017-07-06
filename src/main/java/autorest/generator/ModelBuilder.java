@@ -165,6 +165,7 @@ public class ModelBuilder {
 					schemaProps.add("min: " + value);
 				}
 			}
+			//TODO: add object restrictions, to inner classes
 		}
 		String schema = String.join(",", schemaProps);
 		return schema;

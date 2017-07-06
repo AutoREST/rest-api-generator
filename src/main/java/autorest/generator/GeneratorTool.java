@@ -51,10 +51,10 @@ public class GeneratorTool {
 		if (parsed) {
 			PFSHandler pfsh = yyparser.getPFSHandler();
 			if(pfsh != null){
-				//TODO: HTTP Method Stub Library... work on that
 				this.loadSnippets();
 				pfsh.initializeResources();
 				StringBuilder routes = new StringBuilder();
+				StringBuilder resourcesGet = new StringBuilder();
 				StringBuilder routers_requires = new StringBuilder();
 				Map<String, ModelBuilder> models = new HashMap<>();
 				Map<String, RouterBuilder> routers = new HashMap<>();
@@ -71,16 +71,20 @@ public class GeneratorTool {
 
 					routes.append(this.snippets.get("routes").replace("{{resource_name}}", resourceName));
 					routers_requires.append(this.snippets.get("routers_requires").replace("{{resource_name}}", resourceName));
+					resourcesGet.append(this.snippets.get("resource_get").replace("{{resource_name}}", resourceName));
 				}
 
 				String apiJs = this.snippets.get("api.js");
+				apiJs = apiJs.replace("{{APIName}}", options.APIName);
 				apiJs = apiJs.replace("{{routers_requires}}", routers_requires.toString());
 				apiJs = apiJs.replace("{{routes}}", routes.toString());
 				apiJs = apiJs.replace("{{api_database}}", options.DataBaseName);
-				//TODO: generate console.log of the GET endpoints of each resource
+				apiJs = apiJs.replace("{{resources_get}}", resourcesGet.toString());
+
 				String packageJson = this.snippets.get("package.json");
 				packageJson = packageJson.replace("{{api_repo_url}}", options.APIRepoURL);
 
+				//TODO: receive the file name or path in the arguments
 				String savedAPI = this.saveApi(options.APIName, packageJson, apiJs, models, routers);
 				System.out.println("API saved in: " + savedAPI);
 			}
@@ -102,6 +106,7 @@ public class GeneratorTool {
 		this.snippets.put("api.js", getResourseAsString("/snippets/nodejs/api.js"));
 		this.snippets.put("routers_requires", getResourseAsString("/snippets/nodejs/lines/routers_requires"));
 		this.snippets.put("routes", getResourseAsString("/snippets/nodejs/lines/routes"));
+		this.snippets.put("resource_get", getResourseAsString("/snippets/nodejs/lines/resource_get"));
 		this.snippets.put("router", getResourseAsString("/snippets/nodejs/routers/router.js"));
 		this.snippets.put("model", getResourseAsString("/snippets/nodejs/models/model.js"));
 		this.snippets.put("get_route_simple", getResourseAsString("/snippets/nodejs/routers/routes/get_route_simple"));

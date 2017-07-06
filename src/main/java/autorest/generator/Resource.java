@@ -28,6 +28,8 @@ public class Resource {
 	private List<Resource> specializations;
 
 	public Resource(String name, JSchRestriction restrictions, PFSHandler pfsh) throws Exception{
+		if(restrictions.getTypes().size() > 0 && !(restrictions.getFirstType() == JSONType.OBJECT))
+			throw new Exception("The resource '"+name+"' can have ony one type and it must be \"object\"");
 		this.parentResource = null;
 		this.name = name.toLowerCase();
 		this.collectionName = this.name;
@@ -48,7 +50,6 @@ public class Resource {
 			this.required = new ArrayList<>();
 		if(this.dependencies == null)
 			this.dependencies = new HashMap<>();
-		//TODO: validar tipo Object
 		this.defineReferences(pfsh);
 		if(this.parentResource == null)
 			this.setPrimaryKeys();
@@ -104,7 +105,12 @@ public class Resource {
 
 		for (String name : this.properties.keySet()) {
 			JSchRestriction prop = this.properties.get(name);
-			//TODO: validar se tipos sao: \textit{string}, \textit{integer}, \textit{number}, \textit{boolean}, \textit{object} e \textit{array}
+
+			List<JSONType> types = prop.getTypes();
+			if(!types.contains(JSONType.STRING) && !types.contains(JSONType.INTEGER) && !types.contains(JSONType.NUMBER)
+				&& !types.contains(JSONType.BOOLEAN) && !types.contains(JSONType.OBJECT) && !types.contains(JSONType.ARRAY) && !prop.hasRefs())
+				throw new Exception("Invalid or not supported types in ("+this.name+"."+name+").");
+
 			if(prop.hasRefs() && prop.getRef() != null){
 				Reference refObj = getReference(prop.getRef());
 				Boolean inheritance = refObj.getResourceName() != null && refObj.getPropertyName() == null;
@@ -127,12 +133,7 @@ public class Resource {
 					if(sameItems.hasRefs() && sameItems.getRef() != null){
 						Reference refObj = getReference(sameItems.getRef());
 						Boolean inheritance = refObj.getResourceName() != null && refObj.getPropertyName() == null;
-						if(!inheritance){
-							this.references.put(name, refObj);
-						}
-						else{
-							throw new Exception("Inheritance is invalid inside an array ("+this.name+"."+name+").");
-						}
+						this.references.put(name, refObj);
 					}
 					this.arrayProps.add(name);
 				}

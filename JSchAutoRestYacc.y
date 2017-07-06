@@ -248,14 +248,13 @@ address : 'w' ;
 
 
 	public void yyerror (String error) {
-		System.err.println ("Error: " + error + "  line: " + lexer.getLine() + " text: " + lexer.yytext());
+		System.err.println ("ERROR: " + error + "  line: " + lexer.getLine() + " text: " + lexer.yytext());
 		if(yydebug){
 			//dump_stacks(statestk.length);
 			dump_stacks(10);
 		}
 	}
 
-	//TODO: rename to PFISCompiler
 	public PFISCompiler(String file) throws IOException {
 		this(new FileReader(file));
 		this.file = file;
