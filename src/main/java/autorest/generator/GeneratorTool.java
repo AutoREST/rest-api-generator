@@ -28,7 +28,7 @@ public class GeneratorTool {
 				GeneratorTool generator = new GeneratorTool(fileName, optionsJSON);
 			}
 			else {
-				System.out.println("\n\tRequired input file path\n");
+				throw new Exception("\n\tRequired input file path\n");
 			}
 		}
 		catch (Exception e) {

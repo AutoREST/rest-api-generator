@@ -5,17 +5,6 @@ var mongoose = require('mongoose'),
 var {{model_name}}Schema = new Schema({
 	{{fields}}
 	{{type_field}}
-    // attribute8: { type: [Number], integer: true },
-    // attribute9: {
-    //     type: Date,
-    // },
-    // attribute10: {
-    //     type: Object,
-    // },
-    // attribute11: {
-    //     type: String,
-    //     match: /^[a-zA-Z]*$/,
-    // }
 });
 
 {{multikey_unique_index}}
